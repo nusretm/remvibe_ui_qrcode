@@ -22,6 +22,34 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('defers QR painting while layout width is zero', (tester) async {
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 0,
+          height: 250,
+          child: RemVibeUIQRCode(data: 'RemVibe UI QR'),
+        ),
+      ),
+    ));
+
+    expect(find.byType(PrettyQrView), findsNothing);
+    expect(tester.takeException(), isNull);
+
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 250,
+          height: 250,
+          child: RemVibeUIQRCode(data: 'RemVibe UI QR'),
+        ),
+      ),
+    ));
+
+    expect(find.byType(PrettyQrView), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('reports QR-capacity overflow without exposing data', (tester) async {
     await tester.pumpWidget(MaterialApp(
       home: Scaffold(body: RemVibeUIQRCode(data: List.filled(5000, 'x').join())),

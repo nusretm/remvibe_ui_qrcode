@@ -26,9 +26,18 @@ class RemVibeUIQRCode extends StatelessWidget {
 
     return SizedBox.square(
       dimension: size,
-      child: ColoredBox(
-        color: Colors.white,
-        child: data.isEmpty
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // During the first Android frame, the parent may briefly give this
+          // widget zero width. PrettyQrSquaresSymbol cannot paint a zero-size
+          // matrix, so defer QR painting until both dimensions are positive.
+          if (constraints.maxWidth <= 0 || constraints.maxHeight <= 0) {
+            return const SizedBox.shrink();
+          }
+
+          return ColoredBox(
+            color: Colors.white,
+            child: data.isEmpty
             ? const Center(
                 child: Text(
                   'QR content cannot be empty.',
@@ -51,6 +60,8 @@ class RemVibeUIQRCode extends StatelessWidget {
                   ),
                 ),
               ),
+          );
+        },
       ),
     );
   }
