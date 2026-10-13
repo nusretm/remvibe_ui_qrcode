@@ -6,7 +6,7 @@ Package adı: `remvibe_ui_qrcode`
 Onaylanan kapsam: **Aşama 0–3 ilk sürüm foundation tamamlandı ve `main` dalına squash merge edildi**. Yeni geliştirme checkpoint'i henüz açılmadı.
 Aktif temel branch: `main`.
 PR: [#1](https://github.com/nusretm/remvibe_ui_qrcode/pull/1) **MERGED** (squash commit `e694a18`).
-Merge sonrası continuity güncellemesi: `chore/initial-qr-merge-continuity` branch'inde, doc-only. Cleanup durumu ayrı kayıtlıdır.
+Merge sonrası continuity: [PR #2](https://github.com/nusretm/remvibe_ui_qrcode/pull/2) (doc-only, `chore/initial-qr-merge-continuity`). Cleanup durumu ayrı kayıtlıdır.
 
 ## Repository başlangıcı
 
@@ -478,7 +478,7 @@ Kullanıcının açık `merge yapalım` onayı sonrasında:
 PR #1 merge sonrası `feature/initial-qr-widgets` remote ref'i
 GitHub'da hâlâ mevcuttu. Merge sonrası continuity için
 `chore/initial-qr-merge-continuity` branch'i açıldı;
-bu branch'teki dokümanlar ayrı PR ile `main`'e taşınacak.
+bu branch'in doc-only [PR #2](https://github.com/nusretm/remvibe_ui_qrcode/pull/2) üzerinden `main`'e alınması onaylandı.
 GitHub bağlantısında remote ref **silme eylemi mevcut olmadığından**
 remote ve yerel branch silme durumu **USER_ACTION_REQUIRED** olarak
 kaydedildi. Kullanıcıya merge tamamlandıktan sonra yalnız ilgili
@@ -488,8 +488,9 @@ Branch silme kanıtı gelmeden `CLEANUP_COMPLETE` denmeyecek.
 
 ## Sonraki hedef
 
-1. Merge sonrası continuity PR'ını `main`'e al;
-   bu belge ve CHANGELOG ana daldan okunabilir olsun.
+1. Merge sonrası continuity [PR #2](https://github.com/nusretm/remvibe_ui_qrcode/pull/2)
+   squash merge sonucunu doğrula; bu belge ve CHANGELOG `main`
+   üzerinde olmalı.
 2. Kullanıcı remote `feature/initial-qr-widgets` ve
    `chore/initial-qr-merge-continuity` branch'lerini silsin;
    lokalde yalnız varsa eski feature branch'i silsin.
