@@ -3,9 +3,10 @@
 Tarih: 2026-10-14
 Repository: https://github.com/nusretm/remvibe_ui_qrcode
 Package adı: `remvibe_ui_qrcode`
-Onaylanan kapsam: **Aşama 3 tamamlayıcı Android minSdk uyumu ve son repository incelemesi**. PR/merge için ayrı onay bekleniyor.
-Aktif branch: `feature/initial-qr-widgets`.
-PR: [#1](https://github.com/nusretm/remvibe_ui_qrcode/pull/1) (OPEN, unmerged). Merge: kullanıcı onayı bekleniyor.
+Onaylanan kapsam: **Aşama 0–3 ilk sürüm foundation tamamlandı ve `main` dalına squash merge edildi**. Yeni geliştirme checkpoint'i henüz açılmadı.
+Aktif temel branch: `main`.
+PR: [#1](https://github.com/nusretm/remvibe_ui_qrcode/pull/1) **MERGED** (squash commit `e694a18`).
+Merge sonrası continuity: [PR #2](https://github.com/nusretm/remvibe_ui_qrcode/pull/2) (doc-only, `chore/initial-qr-merge-continuity`). Cleanup durumu ayrı kayıtlıdır.
 
 ## Repository başlangıcı
 
@@ -26,7 +27,7 @@ PR: [#1](https://github.com/nusretm/remvibe_ui_qrcode/pull/1) (OPEN, unmerged). 
 | 2: QR görüntüleme ve Example alanı | IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED | root analyze PASS; root tests +2; Example analyze PASS; Example tests +1; Windows QR kullanıcı tarafından ekranda görüldü; Windows uygulaması kullanıcı tarafından kapatıldı (EXPECTED_EXIT) |
 | 3: QR scanner ve Example alanı | IMPLEMENTED + TESTED + ANDROID_QR_LIVE_VERIFIED; QR_PAINT_GUARD_RETEST_PASS | root analyze PASS / tests +4; Example analyze PASS / tests +1; Android APK build/install/camera PASS; önceki canlı okuma kanıtı geçerli; yeni Android logunda PrettyQr paint assertion tekrarlanmadı |
 | 4: diğer hedef platformlar ve odaklı testler | NOT_STARTED | platforma göre ayrı kayıt |
-| 5: README final, diff review, PR ve kullanıcı onayı | DOCS_UPDATED / DIFF_REVIEWED / PR_OPEN; MERGE_NOT_APPROVED | PR #1 açık, mergeable/clean, otomatik check bulunamadı; kullanıcı merge onayı bekleniyor |
+| 5: README final, diff review, PR ve kullanıcı onayı | DOCS_UPDATED / DIFF_REVIEWED / PR_1_MERGED | PR #1 squash commit `e694a18` GitHub `main` HEAD ile doğrulandı; kullanıcı yerel `main` pull ve temiz working tree bildirdi |
 
 ## Sınırlar ve kararlar
 
@@ -441,15 +442,59 @@ Kullanıcının "tamam" onayı üzerine aşağıdaki PR oluşturuldu:
 - **Merge yapılmadı**; kullanıcıdan ayrıca açık onay alınacak.
   `publish_to: none` olduğundan release/publish işlemi de yok.
 
+## İlk foundation PR #1 merge ve cleanup (2026-10-14)
+
+Kullanıcının açık `merge yapalım` onayı sonrasında:
+
+- PR #1: https://github.com/nusretm/remvibe_ui_qrcode/pull/1
+- GitHub: **CLOSED / MERGED**.
+- Yöntem: **squash**.
+- Merge commit: `e694a187550209eff0b727012b0281f10237bd5f`.
+- GitHub `main` ref HEAD'i bu merge commit'i ile eşleşti.
+- `main` public exportları `RemVibeUIQRCode` ve
+  `RemVibeUIQRScanner` olarak doğrulandı.
+- Kullanıcı PowerShell kanıtı: `git switch main` ardından
+  `git pull --ff-only origin main` **PASS**,
+  `56b2e53..e694a18` fast-forward;
+  `git status`: **main up-to-date / working tree clean**.
+- Kullanıcı daha sonra continuity, merge ve cleanup için tekrar
+  onay verdi. PR #1 zaten başarıyla merged olduğundan aynı PR
+  yeniden birleştirilmedi.
+- Doğrulanmış temel davranış: Windows QR ekranı görüldü;
+  Samsung SM A515F / Android 13 Windows QR'ını okudu ve
+  `RemVibe UI QR` metni doğru alındı; root analyze PASS ve
+  tests +4 PASS, Example analyze PASS ve tests +1 PASS;
+  QR zero-width guard Android retest sonrası assertion üretmedi.
+  Bu kayıtlar **önceki kullanıcı test kanıtlarına** dayanır;
+  merge sonrası yeniden Flutter komutu çalıştırılmış sayılmaz.
+- Açık/doğrulanmamış: iOS gerçek cihaz, Linux/macOS display,
+  yoğun tekrarlı onRead olayları, izin reddi, background/resume,
+  scanner'ı kapatıp tekrar açma.
+- Yayınlama **yapılmadı**: `version: 0.1.0-dev.1`,
+  `publish_to: none`.
+
+### Branch cleanup
+
+PR #1 merge sonrası `feature/initial-qr-widgets` remote ref'i
+GitHub'da hâlâ mevcuttu. Merge sonrası continuity için
+`chore/initial-qr-merge-continuity` branch'i açıldı;
+bu branch'in doc-only [PR #2](https://github.com/nusretm/remvibe_ui_qrcode/pull/2) üzerinden `main`'e alınması onaylandı.
+GitHub bağlantısında remote ref **silme eylemi mevcut olmadığından**
+remote ve yerel branch silme durumu **USER_ACTION_REQUIRED** olarak
+kaydedildi. Kullanıcıya merge tamamlandıktan sonra yalnız ilgili
+iki feature/chore branch için `git push origin --delete`,
+`git branch -d/-D` ve `git fetch --prune` komutları verilecek.
+Branch silme kanıtı gelmeden `CLEANUP_COMPLETE` denmeyecek.
+
 ## Sonraki hedef
 
-1. Yerelde `git pull --ff-only origin feature/initial-qr-widgets`
-   ve `git status` ile `4811641` ve yeni continuity commit'i
-   senkronize/temiz olduğunu doğrula.
-2. İstenirse Android'de bir kez daha `flutter run` ile
-   varsayılan minSdk yapılandırmasının bu commit'te de
-   çalıştığını göster; önceki build/scan kanıtları aynen korunur.
-3. Scanner lifecycle/permission ve iOS/Linux/macOS platform
-   kontrolleri ayrı opsiyonel doğrulamalardır; yapılmadan PASS
-   sayılmayacak.
-4. PR #1'i incele; merge için **kullanıcıdan ayrı açık onay** al.
+1. Merge sonrası continuity [PR #2](https://github.com/nusretm/remvibe_ui_qrcode/pull/2)
+   squash merge sonucunu doğrula; bu belge ve CHANGELOG `main`
+   üzerinde olmalı.
+2. Kullanıcı remote `feature/initial-qr-widgets` ve
+   `chore/initial-qr-merge-continuity` branch'lerini silsin;
+   lokalde yalnız varsa eski feature branch'i silsin.
+   Kullanıcı `git status` ve `git branch -a` ile doğrulasın.
+3. Yeni geliştirme checkpoint'i **ayrı açık kullanıcı onayı**
+   olmadan başlamaz. iOS ve lifecycle kontrolleri tamamlanmış
+   olarak işaretlenmez.

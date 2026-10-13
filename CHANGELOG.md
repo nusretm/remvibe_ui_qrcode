@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Initial QR widget foundation merge — 2026-10-14
+- PR #1 (https://github.com/nusretm/remvibe_ui_qrcode/pull/1) merged into
+  `main` by squash: `e694a187550209eff0b727012b0281f10237bd5f`.
+- User verified `git pull --ff-only origin main` and clean working tree.
+- Windows QR display, Android physical QR scan and latest widget tests remain
+  the recorded acceptance evidence; no post-merge Flutter run claimed.
+- Preserve iOS, Linux/macOS and scanner lifecycle/permission cases as
+  unverified; publishing and branch cleanup are separate actions.
+
 ### Planned
 - Android scanner lifecycle/one-shot edge-case checks and optional iOS device validation.
 
