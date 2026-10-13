@@ -5,7 +5,7 @@ Repository: https://github.com/nusretm/remvibe_ui_qrcode
 Package adı: `remvibe_ui_qrcode`
 Onaylanan kapsam: **Aşama 3 tamamlayıcı Android minSdk uyumu ve son repository incelemesi**. PR/merge için ayrı onay bekleniyor.
 Aktif branch: `feature/initial-qr-widgets`.
-Merge: kullanıcı onayı bekleniyor.
+PR: [#1](https://github.com/nusretm/remvibe_ui_qrcode/pull/1) (OPEN, unmerged). Merge: kullanıcı onayı bekleniyor.
 
 ## Repository başlangıcı
 
@@ -26,7 +26,7 @@ Merge: kullanıcı onayı bekleniyor.
 | 2: QR görüntüleme ve Example alanı | IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED | root analyze PASS; root tests +2; Example analyze PASS; Example tests +1; Windows QR kullanıcı tarafından ekranda görüldü; Windows uygulaması kullanıcı tarafından kapatıldı (EXPECTED_EXIT) |
 | 3: QR scanner ve Example alanı | IMPLEMENTED + TESTED + ANDROID_QR_LIVE_VERIFIED; QR_PAINT_GUARD_RETEST_PASS | root analyze PASS / tests +4; Example analyze PASS / tests +1; Android APK build/install/camera PASS; önceki canlı okuma kanıtı geçerli; yeni Android logunda PrettyQr paint assertion tekrarlanmadı |
 | 4: diğer hedef platformlar ve odaklı testler | NOT_STARTED | platforma göre ayrı kayıt |
-| 5: README final, diff review, PR ve kullanıcı onayı | DOCS_UPDATED / DIFF_REVIEWED; PR_NOT_OPEN / MERGE_NOT_APPROVED | SDK kararı `4811641`, son doc commit; kalan opsiyonel cihaz/lifecycle kontrolleri kayıtlı |
+| 5: README final, diff review, PR ve kullanıcı onayı | DOCS_UPDATED / DIFF_REVIEWED / PR_OPEN; MERGE_NOT_APPROVED | PR #1 açık, mergeable/clean, otomatik check bulunamadı; kullanıcı merge onayı bekleniyor |
 
 ## Sınırlar ve kararlar
 
@@ -420,6 +420,27 @@ Bu konular **UNVERIFIED**, başarısız olarak raporlanmış değiller.
 
 Bu inceleme **PR açma veya merge yetkisi değildir**.
 
+## PR incelemesi — #1 OPEN (2026-10-14)
+
+Kullanıcının "tamam" onayı üzerine aşağıdaki PR oluşturuldu:
+
+- URL: https://github.com/nusretm/remvibe_ui_qrcode/pull/1
+- Başlık: `feat: initial Flutter QR display and Android/iOS scanner widgets`
+- Base: `main`; head: `feature/initial-qr-widgets`.
+- PR oluşturulduğunda head `7a247ed9c277a917fbe741f0cabe87f8ca6c214c`.
+- `main..feature/initial-qr-widgets`: 21 commit, 138 değişen dosya;
+  çoğunluk Flutter Example native runner kaynak ve assetleri.
+- GitHub PR kontrolü: `state=open`, `merged=false`,
+  `mergeable=true`, `mergeable_state=clean`.
+- Head commit'e bağlı `check-runs` sayısı: **0**. Bu durum
+  `CI PASS` olarak değerlendirilmedi.
+- PR açıklamasında root analyze/test (+4), Example analyze/test (+1),
+  Windows QR gösterme ve Samsung Android QR tarama gerçek kullanıcı
+  kanıtları, kapsam sınırları ve doğrulanmamış platform/lifecycle
+  kontrolleri ayrı ayrı kaydedildi.
+- **Merge yapılmadı**; kullanıcıdan ayrıca açık onay alınacak.
+  `publish_to: none` olduğundan release/publish işlemi de yok.
+
 ## Sonraki hedef
 
 1. Yerelde `git pull --ff-only origin feature/initial-qr-widgets`
@@ -431,4 +452,4 @@ Bu inceleme **PR açma veya merge yetkisi değildir**.
 3. Scanner lifecycle/permission ve iOS/Linux/macOS platform
    kontrolleri ayrı opsiyonel doğrulamalardır; yapılmadan PASS
    sayılmayacak.
-4. PR/merge için **kullanıcıdan ayrı açık onay** al.
+4. PR #1'i incele; merge için **kullanıcıdan ayrı açık onay** al.
