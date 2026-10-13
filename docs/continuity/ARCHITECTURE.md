@@ -1,6 +1,6 @@
 # Architecture — RemVibe UI QR
 
-Durum: QR display **IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED** (Aşama 2); scanner **DESIGNED / NOT_STARTED** (2026-10-14).
+Durum: QR display **IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED** (Aşama 2); scanner **IMPLEMENTED / NOT_TESTED / NOT_LIVE_VERIFIED** (2026-10-14).
 
 ## Sorumluluklar
 
@@ -142,6 +142,31 @@ app resumed ve hâlâ bekleniyorsa -> güvenli şekilde devam et
 Kullanıcı root analyzer PASS, root tests (+2) PASS, Example analyzer PASS
 ve Example tests (+1) PASS bildirdi. Windows Example native build çalıştı,
 QR kod gerçek ekranda görüldü: **WINDOWS_QR_LIVE_VERIFIED**.
-Daha sonra debug bağlantısı `Lost connection to device` ile kesildi;
-sebebi **UNRESOLVED**. Manuel metin güncellemesi ve optik QR okutma
-ayrıca doğrulanmadı. Scanner halen uygulanmadı.
+Kullanıcı debug oturumunu pencereyi kapatarak sonlandırdığını doğruladı:
+`Lost connection to device` **EXPECTED_EXIT**. Manuel metin güncellemesi
+ve optik QR okutma ayrıca doğrulanmadı.
+
+## Aşama 3 implementation — Android/iOS scanner
+
+- `RemVibeUIQRScanner` bir `StatefulWidget`; tek required public argüman
+  `FutureOr<void> Function(String data) onRead`.
+- `MobileScanner` dahili controller'ını kullanır: kamera init, izin isteği,
+  uygulama lifecycle ve dispose işlemleri `mobile_scanner` tarafından yönetilir.
+  Paket ek controller/provider/service oluşturmaz.
+- Platform gate: `kIsWeb || platform !Android/iOS` ise kamera widget'ı
+  **hiç oluşturulmaz**. Desktop unsupported UI yerel native plugin istemez.
+- Kamera aktifken `BarcodeFormat.qrCode` dışı barcode ignored;
+  yalnız `barcode.rawValue` boş değilse işlem başlar.
+- Senkron `_completed` set edilir; sonraki frame scanner widget çıkarılır.
+  Plugin cleanup başladıktan sonra `onRead` bir kere çağrılır.
+  Event stream'de tekrar algılanan QR kilitle elenir.
+- Callback'in `FutureOr<void>` sonucu beklenir; error durumunda raw error
+  veya QR payload loglanmadan genel widget hata metni gösterilir.
+  New scan için scanner widget'ının kapatılıp yeniden oluşturulması gerekir.
+- `errorBuilder`: permission denied vs camera unavailable. `onDetectError`
+  generic scanning failure, event subscription/plugin cleanup dahili.
+- Native Example: Android minSdk 23; iOS `NSCameraUsageDescription`.
+- Example `Open scanner` / `Close scanner`; raw string gösterimini yalnız
+  üst seviye Example `Last scanned QR` alanı yapar.
+- Test/cihaz durumu: kod **IMPLEMENTED**, yeni analiz/test ve native Android
+  run **NOT_RUN**; canlı tarama `NOT_LIVE_VERIFIED`.

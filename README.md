@@ -2,7 +2,7 @@
 
 **Durum: QR gösterme widget'ı Windows'ta gerçek ekranda görüntülendi;**
 kod, root/Example analyze ve odaklı testler başarılı. Android/iOS scanner
-henüz uygulanmadı.
+kodu eklendi ancak yeni testler ve gerçek cihaz taraması henüz yapılmadı.
 Example uygulaması metin girip canlı QR önizlemesi gösterir ve
 Android/iOS/Windows/Linux/macOS native runner dosyalarını içerir.
 
@@ -12,7 +12,7 @@ Android/iOS/Windows/Linux/macOS native runner dosyalarını içerir.
   (`pretty_qr_code`).
 - `RemVibeUIQRScanner`: Android/iOS kamerasından QR okuyup
   `FutureOr<void> Function(String)` callback
-  (`mobile_scanner`).
+  (`mobile_scanner`, Aşama 3 uygulandı; Android canlı test bekleniyor).
 
 Account/authentication, QR protocol, navigation, server API ve başka
 RemVibe package bağımlılığı içermez. QR içeriği otomatik olarak
@@ -29,7 +29,8 @@ yorumlanmaz, kaydedilmez veya loglanmaz.
 | iOS | Evet | Evet |
 | Web | Destek hedefi değil | Destek hedefi değil |
 
-Bunlar **tasarlanan** hedeflerdir, henüz live validation yapılmadı.
+QR gösterimi Windows'ta doğrulandı. Android/iOS scanner ve diğer hedef
+platformlarda gerçek çalışma henüz doğrulanmadı.
 
 ## Flutter SDK ve kurulum
 
@@ -102,11 +103,11 @@ Example bölümü Aşama 3'te eklenecek.
 
 > Aşama 2 için root `flutter analyze` ve `flutter test` (+2), Example
 > `flutter analyze` ve `flutter test` (+1) başarılı. Windows üzerinde QR
-> gerçekten görüldü; debug oturumunda tekrar `Lost connection to device`
-> oluştu, sebebi henüz doğrulanmadı. Manuel QR metin değişikliği ve
-> başka bir cihazla optik okuma ayrıca doğrulanmadı.
+> gerçekten görüldü; `Lost connection to device` kullanıcının Windows
+> uygulama penceresini kapatmasıyla oluşan **beklenen kapanış** mesajıdır.
+> Manuel QR metin değişikliği ve başka bir cihazla optik okuma ayrıca doğrulanmadı.
 
-## QR okuma — planlanan API (Android / iOS)
+## QR okuma — uygulanan API (Android / iOS)
 
 ```dart
 import 'package:flutter/material.dart';
@@ -146,7 +147,23 @@ Callback senkron da olabilir. Widget **one-shot** çalışır: ilk QR
 okununca callback yalnız bir kez çağrılır, callback devam ederken tekrar
 iletilmez ve tamamlandıktan sonra otomatik devam etmez.
 Yeni okuma için uygulama yeni bir scanner widget oturumu oluşturur.
-Widget navigasyon veya login yönetmez.
+Widget navigasyon veya login yönetmez. QR içeriği `rawValue` üzerinden
+aynen iletilir; yorumlanmaz, filtrelenmez veya loglanmaz (yalnız QR
+formatı ve boş olmayan değer kontrol edilir).
+
+Kamera `mobile_scanner` widget'ı oluşturulunca hazırlanır. Kamera izni
+ilk kullanımda OS tarafından istenir ve uygulama background/resume
+yönetimi plugin'in kendi lifecycle'ına bırakılır. Bir QR kabul edilince
+scanner kamera görünümü kaldırılır; kamera kaynaklarının asenkron
+bırakılması başlar ve callback tek sefer çalıştırılır. Callback başarısız
+olursa `QR processing failed.` görünür; aynı oturumda yeniden okuma yoktur.
+
+İzin reddedilirse `Camera permission denied. Enable camera access in
+device settings.` görünür. Kamera başlatma/detection hataları kullanıcıya
+QR içeriğini sızdırmayan genel metinle bildirilir. İzin engeli kalktıktan
+sonra ya da yeniden tarama için uygulama yeni scanner widget oluşturmalıdır.
+Windows/Linux/macOS/Web üzerinde kamera hiç başlatılmaz, destek dışı
+mesajı gösterilir.
 
 ## Host Flutter uygulamasında platform ayarları
 
@@ -154,7 +171,7 @@ Aşağıdaki native ayarlar **QR scanner kullanılacak Android/iOS uygulamaları
 içindir. Package widget'ının kendi içinde yönetemeyeceği izin açıklaması ve
 native build gereksinimleri host uygulamanın sorumluluğundadır.
 Bilgiler `mobile_scanner 7.4.2` kaynaklarından derlendi;
-**Example gerçek build ile henüz doğrulanmadı**.
+**Android/iOS Example native build ve kamera testi henüz doğrulanmadı**.
 
 ### Android
 
@@ -170,6 +187,9 @@ Bilgiler `mobile_scanner 7.4.2` kaynaklarından derlendi;
    açıkça da eklenebilir.
 3. Gerçek cihaz kamera iznini Android çalışma zamanında ister;
    kullanıcı reddederse scanner kontrollü durum gösterir.
+4. Repository'nin Example uygulamasında `example/android/app/build.gradle.kts`
+   için `minSdk = 23` ayarlanmıştır. Host uygulamanız için aynı minimum
+   sürüm kuralını uygulayın. Android cihazda gerçek build/run henüz yapılmadı.
 
 Örnek `android/app/build.gradle.kts` parçası (var olan Android
 yapılandırmanızı tümüyle değiştirmeyin):
@@ -209,6 +229,10 @@ doğrulanmalıdır; uygulama deployment target'ı uyumlu seçin.
 Yalnız kamera ile QR taranacağı için fotoğraf galerisi izni gerekmez.
 Simülatörde kamera doğrulaması fiziksel iPhone testi yerine geçmez.
 
+Repository'nin Example uygulamasında
+`example/ios/Runner/Info.plist` içine `NSCameraUsageDescription` eklendi.
+Gerçek iOS derlemesi/macOS geliştirme ortamında henüz çalıştırılmadı.
+
 ### Windows, Linux ve macOS
 
 Bu üç platformda QR **gösterme** hedeflenir; normal Flutter desktop
@@ -233,8 +257,9 @@ desteği olması bu package için Web test/destek taahhüdü değildir.
 
 Aşama 1'de `example/lib/main.dart` temel uygulama kabuğu oluşturuldu.
 Aşama 2'de metin alanı ve QR önizlemesi eklendi.
-Aşama 3'te scanner kamera alanı, okunan metin, izin reddi ve
-unsupported UI eklenecek.
+Aşama 3'te `Open scanner` / `Close scanner` kontrolleri, scanner kamera
+alanı ve `Last scanned QR` sonucu eklendi. İzin reddi ve desktop
+unsupported görünümü doğrudan scanner widget'ı tarafından yönetilir.
 
 Native runner klasörleri feature branch'te mevcuttur; yeni clone için
 `flutter create` çalıştırmaya gerek yoktur. Example'ı çalıştırmak için:
@@ -252,13 +277,44 @@ Aşama 1'in kullanıcı tarafından raporlanan doğrulamaları:
 `flutter pub get` (root/Example), `flutter analyze` (root/Example),
 `flutter test` (+1), Windows native build ve VM Service başlangıcı
 başarılı. Windows debug oturumu daha sonra `Lost connection to device`
-ile sonlandı; kesintisiz çalışma **henüz doğrulanmadı**.
+ile sonlandı. Kullanıcı uygulama penceresini kendisinin kapattığını
+bildirdi; bu normal bir Windows debug oturumu bitişidir.
 
 Aşama 2 değişiklikleri sonrasında root/Example analyzer ve testler yeniden
 çalıştırıldı ve başarılı oldu (root +2, Example +1). Windows üzerinde
-QR kod ekranda görüntülendi. Debug bağlantısının sonradan kesilme nedeni
-**UNRESOLVED**; bu sonucu QR görüntüleme başarısıyla karıştırmıyoruz.
-Scanner için Android/iOS gerçek cihaz doğrulaması Aşama 3'te yapılacaktır.
+QR kod ekranda görüntülendi. Debug bağlantısı kullanıcı uygulamayı
+kapattığından sona erdi (beklenen).
+
+Aşama 3 scanner kodu ve platform ayarları eklendi. Bu yeni değişiklikler
+için root/Example `flutter analyze`, `flutter test`, Windows unsupported
+UI kontrolü ve Android gerçek kamera doğrulaması **henüz yapılmadı**.
+Testleri root ve `example/` klasöründe yeniden çalıştırın.
+
+### İlk Android kamera doğrulaması
+
+QR gösterimini Windows Example'da açın, Android cihazda scanner
+sayfasını/alanını açarak Windows ekranındaki QR kodu okutun.
+Bu yöntem aynı telefonda ekranda QR gösterme ve kamerayla okuma
+sorununu önler.
+
+```powershell
+cd D:\development\cross-platform\remvibe_ui_qrcode
+git pull --ff-only origin feature/initial-qr-widgets
+flutter analyze
+flutter test
+cd example
+flutter analyze
+flutter test
+flutter devices
+flutter run -d <android-device-id>
+```
+
+Android izin isteğini kabul edin; QR okunduğunda `Last scanned QR`
+alanında aynı içeriğin bir kere göründüğünü kontrol edin. Yeniden okumak
+için `Open scanner` ile yeni oturum açın. İzin reddi, widget'ın
+kapatılması ve tekrar açılması, uygulama background/resume senaryoları
+ayrı ayrı kontrol edilsin. Çıktılar ve gözlemler
+`docs/continuity/CURRENT_TARGET.md` dosyasına kaydedilecek.
 
 ## Development ve belgeler
 

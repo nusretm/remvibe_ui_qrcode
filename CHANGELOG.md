@@ -3,8 +3,17 @@
 ## Unreleased
 
 ### Planned
-- `RemVibeUIQRScanner` Android/iOS one-shot scanner backed by `mobile_scanner`.
-- Android scanner Example and real Android camera validation.
+- Android scanner real-device camera validation and optional iOS device validation.
+
+### QR scanner (Aşama 3) — 2026-10-14
+- Add `RemVibeUIQRScanner` with one-shot `FutureOr<void>` QR callback.
+- Limit scanning to Android/iOS, show controlled unsupported UI on desktop/Web.
+- Delegate camera permission, lifecycle and disposal to `mobile_scanner`.
+- Handle permission, start/detection and callback failures without leaking raw QR data.
+- Add Example scanner open/close actions and last scanned string display.
+- Configure Example Android minSdk 23 and iOS `NSCameraUsageDescription`.
+- Add one focused desktop unsupported widget test.
+- Stage 3 analyze, tests and Android/iOS camera run have not yet been executed.
 
 ### QR display (Aşama 2) — 2026-10-14
 - Add `RemVibeUIQRCode(data: ..., size: 250)` using `pretty_qr_code 3.6.0`.
@@ -14,7 +23,7 @@
 - Add focused root QR and Example interaction tests (not yet executed).
 - Validate QR display in a real Windows Example run (user confirmed QR visible).
 - Root `flutter analyze` PASS, `flutter test` +2 PASS; Example `flutter analyze` PASS, `flutter test` +1 PASS.
-- Windows debug session later reported `Lost connection to device`; cause still unresolved.
+- Windows `Lost connection to device` was expected: user closed the Example window.
 
 ### Package/Example scaffold — 2026-10-14
 - Add Flutter package `pubspec.yaml`, public library entrypoint and lints.
@@ -23,11 +32,11 @@
 - Add Flutter/Dart/IDE generated-artifact ignore rules.
 - Add Android, iOS, Windows, Linux and macOS native Example runner templates (commit `7882a42`).
 - Verify root/Example dependency resolution and analysis; Example smoke test passed (+1).
-- Verify Windows Example shell native build and VM Service startup; subsequent disconnection remains unresolved.
+- Verify Windows Example shell native build and VM Service startup; termination followed the user's window close.
 
 ### Documentation baseline — 2026-10-13
 - Adapt repository working rules from `mtn_launcher`.
 - Record architecture, current target, platform contract, and verification status.
 - Draft README integration and native platform setup guide.
 
-> QR display is implemented, analyzed, tested, and visually verified on Windows. Scanner is not implemented. Debug connection loss remains unresolved; Android/iOS, Linux/macOS and QR optical-reading validation are pending.
+> QR display is implemented, analyzed, tested and visually verified on Windows. Scanner implementation is present but not yet analyzed/tested or verified on a physical Android/iOS device. User-confirmed app closure explains the Windows debug disconnect.
