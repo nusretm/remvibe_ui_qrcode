@@ -316,6 +316,38 @@ kapatılması ve tekrar açılması, uygulama background/resume senaryoları
 ayrı ayrı kontrol edilsin. Çıktılar ve gözlemler
 `docs/continuity/CURRENT_TARGET.md` dosyasına kaydedilecek.
 
+### Windows'ta Android Kotlin cache hatası (C: / D:)
+
+Android Example farklı bir sürücüdeki Pub Cache'den plugin kaynaklarını
+derlerken şu mesajı verebilir:
+
+```text
+:mobile_scanner:compileDebugKotlin
+this and base files have different roots
+Could not close incremental caches
+```
+
+Bu, kamera callback hatası değil, Kotlin incremental compilation
+yol/cache sorunudur. Bu repository'nin
+`example/android/gradle.properties` dosyasında yalnız Example build için
+`kotlin.incremental=false` workaround'ı bulunur. Flutter başka
+bir host uygulamaya entegre edilecekse o uygulamanın Android Gradle
+yapılandırması ve Pub Cache konumu ayrıca değerlendirilmelidir.
+
+Example'ı yenilemek için:
+
+```powershell
+cd example
+flutter clean
+flutter pub get
+flutter run -d R58R50BT2BB
+```
+
+`flutter clean` yalnız oluşturulmuş build çıktıları/Flutter geçici
+dosyalarını temizler; source dosyalarını veya Pub Cache'i silmez.
+Önceki `flutter run` yerel Gradle dosyasını yükselttiyse yeni pull
+öncesinde mutlaka `git status` ve `git diff` kontrol edilmelidir.
+
 ## Development ve belgeler
 
 - [Repository kuralları](AGENTS.md)

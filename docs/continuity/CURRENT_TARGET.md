@@ -24,7 +24,7 @@ Merge: kullanıcı onayı bekleniyor.
 | 0: AGENTS, çalışma kuralları, continuity, README başlangıcı | IMPLEMENTED (doc only; GitHub diff ve yerel temiz working tree kontrol edildi) | Commit `0e6aa97`; kullanıcı `git status` temiz olduğunu bildirdi |
 | 1: Flutter package temel dosyaları, pubspec ve bağımlılıklar | IMPLEMENTED + TESTED (Example shell), NATIVE_RUNNERS_COMMITTED; USER_CLOSED_WINDOW | `flutter pub get`, Example analyze/test, root analyze PASS; Windows build/VM Service başlangıcı PASS, sonra bağlantı kesildi |
 | 2: QR görüntüleme ve Example alanı | IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED | root analyze PASS; root tests +2; Example analyze PASS; Example tests +1; Windows QR kullanıcı tarafından ekranda görüldü; Windows uygulaması kullanıcı tarafından kapatıldı (EXPECTED_EXIT) |
-| 3: QR scanner ve Example alanı | IMPLEMENTED / NOT_TESTED / NOT_LIVE_VERIFIED | Scanner, Example kamera görünümü, Android minSdk 23, iOS kamera izni; Android fiziksel cihaz testi bekleniyor |
+| 3: QR scanner ve Example alanı | IMPLEMENTED / TEST_BLOCKED / ANDROID_BUILD_BLOCKED / NOT_LIVE_VERIFIED | Root scanner test override ve C:/D: Kotlin incremental cache hatası görüldü; düzeltme `ec02d50` uygulandı, tekrar doğrulama bekleniyor |
 | 4: diğer hedef platformlar ve odaklı testler | NOT_STARTED | platforma göre ayrı kayıt |
 | 5: README final, diff review, PR ve kullanıcı onayı | NOT_STARTED | gözden geçirilmiş PR; merge ayrı onaylı |
 
@@ -229,16 +229,64 @@ merge veya farklı checkpoint onayı sayılmaz.
 - Minimum Dart/Flutter constraint değiştirilmedi, yeni
   production dependency eklenmedi.
 
+## Aşama 3 — İlk çalıştırma bulguları ve düzeltme (2026-10-14)
+
+Kullanıcının Windows/Android PowerShell çıktıları:
+
+- `git pull --ff-only origin feature/initial-qr-widgets`: **PASS**;
+  `fc794c1..76ec0d6` fast-forward.
+- Root `flutter analyze`: **PASS**, No issues found.
+- Root `flutter test`: **FAIL**, +2 -1; `remvibe_ui_qr_scanner_test.dart`
+  içinde `debugDefaultTargetPlatformOverride` yalnız
+  `addTearDown` ile reset edildiği için Flutter invariant testi
+  "The value of a foundation debug variable was changed by the test."
+  hatası üretti. Bu test yalnız test altyapısı hatasıdır;
+  Windows scanner unsupported davranışı ayrıca başarısız bulunmadı.
+- Example `flutter analyze`: **PASS**, No issues found.
+- Example `flutter test`: **PASS**, +1 All tests passed.
+- `flutter run -d windows`: **BUILD_VERIFIED**; VM Service açıldı.
+  `Lost connection to device` önceki kullanıcı açıklamasına göre
+  uygulamanın elle kapatılmasının beklenen sonucudur.
+- `flutter devices`: fiziksel Samsung **SM A515F**,
+  Android **13 / API 33** (ID `R58R50BT2BB`) bulundu.
+- `flutter run -d R58R50BT2BB`: **BUILD_FAILED**,
+  `:mobile_scanner:compileDebugKotlin`, Kotlin incremental cache.
+  Nested asıl hata: `this and base files have different roots`,
+  `C:\Users\nusre\AppData\Local\Pub\Cache\...` ile
+  `D:\development\cross-platform\remvibe_ui_qrcode\example\android`
+  sürücü farkı. Henüz kamera açılmadı; QR scan live validation yok.
+
+Bu hatalar için `ec02d504ca01bd182e89277b7ff887c98e02bbb1` commit'i:
+
+1. Scanner testinde `debugDefaultTargetPlatformOverride` artık
+   `try/finally` ile **test tamamlanmadan** temizleniyor.
+2. Yalnız `example/android/gradle.properties` içine
+   `kotlin.incremental=false` eklendi. Windows'ta C: pub cache /
+   D: Example yolları için Kotlin incremental cache workaround'ı.
+   Example Android Kotlin derlemeleri kısmen daha yavaş olabilir.
+3. Public widget API, scanner işleyişi, dependency ve diğer platform
+   kodları değiştirilmedi.
+
+**Düzeltmeler GitHub'a commit edildi fakat yeni root `flutter test`
+ve Android `flutter run` sonuçları henüz alınmadı.**
+`TEST_BLOCKED` ve `ANDROID_BUILD_BLOCKED` durumları
+retest kanıtına kadar geçerlidir.
+
+Flutter Android komutu yerel olarak otomatik `Upgrading build.gradle.kts`
+mesajı gösterdi; pull öncesinde `git status` ve varsa
+`git diff -- example/android/app/build.gradle.kts` kontrol edilmelidir.
+Kullanıcı değişiklikleri incelemeden silinmeyecektir.
+
 ## Sonraki hedef
 
-1. Kullanıcı repo branch'ini `git pull --ff-only` ile güncellesin.
-2. Root ve Example için `flutter analyze` / `flutter test`
-   çalıştırılsın; Windows `flutter run -d windows` ile
-   scanner unsupported görünümü ve QR preview regresyonu görülsün.
-3. Android fiziksel cihaz bağlayıp `flutter devices` çıktısını
-   kontrol ettikten sonra Example `flutter run -d <device-id>`
-   ile gerçek kamera izni, okuma, tek seferlik callback, aç/kapat,
-   arka plan ve geri dönüş davranışını doğrulasın.
-4. Sonuçları continuity'ye kaydet ve ancak live evidence geldikten
-   sonra scanner'a `LIVE_VERIFIED` yaz.
-5. Kullanıcının ayrı onayı olmadan merge veya sonraki genişleme yok.
+1. Kullanıcı yerelde `git status --short` ve gerekirse
+   `git diff -- example/android/app/build.gradle.kts` ile Flutter'ın
+   build sırasında bıraktığı değişiklikleri gözden geçirsin.
+2. Temiz/uyumlu working tree ile `git pull --ff-only origin
+   feature/initial-qr-widgets` çalıştırıp root `flutter test` tekrar etsin.
+3. `cd example`; `flutter clean`, `flutter pub get`,
+   `flutter run -d R58R50BT2BB` komutlarıyla Kotlin build ve
+   fiziksel Android kamera akışını tekrar doğrulasın.
+4. Başarılı Android live scan, izin yönetimi, one-shot callback ve
+   tekrar açma sonuçları gelene kadar Aşama 3 kapanmaz.
+5. Merge ve farklı checkpoint için ayrı kullanıcı onayı gerekir.

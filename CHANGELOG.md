@@ -5,6 +5,14 @@
 ### Planned
 - Android scanner real-device camera validation and optional iOS device validation.
 
+### Aşama 3 build/test düzeltmesi — 2026-10-14
+- Reset the desktop scanner widget-test platform override inside `try/finally`,
+  before Flutter test invariant checks.
+- Work around cross-drive Kotlin incremental-cache failures in the Android
+  Example using `kotlin.incremental=false` in `example/android/gradle.properties`.
+- Root analyze and Example analyze/test passed; initial root test and Android
+  build failed as recorded in continuity. Fixes are committed, rerun pending.
+
 ### QR scanner (Aşama 3) — 2026-10-14
 - Add `RemVibeUIQRScanner` with one-shot `FutureOr<void>` QR callback.
 - Limit scanning to Android/iOS, show controlled unsupported UI on desktop/Web.
