@@ -24,7 +24,7 @@ Merge: kullanıcı onayı bekleniyor.
 | 0: AGENTS, çalışma kuralları, continuity, README başlangıcı | IMPLEMENTED (doc only; GitHub diff ve yerel temiz working tree kontrol edildi) | Commit `0e6aa97`; kullanıcı `git status` temiz olduğunu bildirdi |
 | 1: Flutter package temel dosyaları, pubspec ve bağımlılıklar | IMPLEMENTED + TESTED (Example shell), NATIVE_RUNNERS_COMMITTED; USER_CLOSED_WINDOW | `flutter pub get`, Example analyze/test, root analyze PASS; Windows build/VM Service başlangıcı PASS, sonra bağlantı kesildi |
 | 2: QR görüntüleme ve Example alanı | IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED | root analyze PASS; root tests +2; Example analyze PASS; Example tests +1; Windows QR kullanıcı tarafından ekranda görüldü; Windows uygulaması kullanıcı tarafından kapatıldı (EXPECTED_EXIT) |
-| 3: QR scanner ve Example alanı | IMPLEMENTED / TEST_BLOCKED / ANDROID_BUILD_BLOCKED / NOT_LIVE_VERIFIED | Root scanner test override ve C:/D: Kotlin incremental cache hatası görüldü; düzeltme `ec02d50` uygulandı, tekrar doğrulama bekleniyor |
+| 3: QR scanner ve Example alanı | IMPLEMENTED + TESTED + ANDROID_QR_LIVE_VERIFIED; QR_PAINT_FIX_RETEST_PENDING | root flutter test +3 PASS; Android debug APK build + install PASS; Samsung SM A515F Windows QR'ı taradı ve `RemVibe UI QR` elde edildi; ilk Android frame'inde ayrı QR paint assertion görüldü |
 | 4: diğer hedef platformlar ve odaklı testler | NOT_STARTED | platforma göre ayrı kayıt |
 | 5: README final, diff review, PR ve kullanıcı onayı | NOT_STARTED | gözden geçirilmiş PR; merge ayrı onaylı |
 
@@ -57,7 +57,7 @@ Merge: kullanıcı onayı bekleniyor.
 - Flutter/Dart/YAML scaffold GitHub üzerinden oluşturuldu: `pubspec.yaml`, `analysis_options.yaml`, `.gitignore`, public library entrypoint, `example/pubspec.yaml`, `example/lib/main.dart`, minimal Example smoke testi.
 - Example `android/`, `ios/`, `windows/`, `linux/`, `macos/` native runner klasörleri **kullanıcının yerel ortamında** `flutter create` ile oluşturuldu (120 dosya raporu); bunlardan commit kapsamına giren 119 yeni dosya GitHub `7882a42` commit'inde **COMMITTED**.
 - Windows gerçek QR görünümü: **LIVE_VERIFIED** (kullanıcı QR kodun ekranda göründüğünü bildirdi; Aşama 2).
-- Android fiziksel kamera taraması: **NOT_RUN**.
+- Android fiziksel kamera taraması: **LIVE_VERIFIED** (Samsung SM A515F / Android 13, Windows ekranından `RemVibe UI QR` alındı).
 - iOS/Linux/macOS: **NOT_RUN**.
 
 ## Ortam doğrulaması — kullanıcı raporu (2026-10-13)
@@ -267,26 +267,75 @@ Bu hatalar için `ec02d504ca01bd182e89277b7ff887c98e02bbb1` commit'i:
 3. Public widget API, scanner işleyişi, dependency ve diğer platform
    kodları değiştirilmedi.
 
-**Düzeltmeler GitHub'a commit edildi fakat yeni root `flutter test`
-ve Android `flutter run` sonuçları henüz alınmadı.**
-`TEST_BLOCKED` ve `ANDROID_BUILD_BLOCKED` durumları
-retest kanıtına kadar geçerlidir.
+Bu paragraftaki blokaj durumu ilk `ec02d50` commit'inden hemen sonraki
+**tarihsel durumdur**. Kullanıcı daha sonra retest'i tamamladı; aşağıdaki
+Android canlı doğrulama kaydı güncel sonucu içerir.
 
 Flutter Android komutu yerel olarak otomatik `Upgrading build.gradle.kts`
 mesajı gösterdi; pull öncesinde `git status` ve varsa
 `git diff -- example/android/app/build.gradle.kts` kontrol edilmelidir.
 Kullanıcı değişiklikleri incelemeden silinmeyecektir.
 
+## Aşama 3 — Fiziksel Android LIVE_VERIFIED (2026-10-14)
+
+**Kullanıcı kanıtı:** Samsung **SM A515F**, Android **13 (API 33)**,
+`flutter run -d R58R50BT2BB`; Windows Example'da oluşturulan QR
+kamera ile okutuldu ve **`RemVibe UI QR`** metni alındı.
+
+- `git pull --ff-only origin feature/initial-qr-widgets`: **PASS**
+  (`76ec0d6..ee7e3ed` fast-forward).
+- `flutter test` (root): **PASS**, `+3 All tests passed!`.
+  Önceki debug platform override test hatası giderildi.
+- `example/flutter clean`: **PASS**.
+- `example/flutter pub get`: **PASS**, Got dependencies.
+- `example/flutter run -d R58R50BT2BB`: Android Gradle
+  `assembleDebug` **PASS**, APK oluşturuldu ve cihaza kuruldu.
+  Kotlin C:/D: incremental cache derleme hatası tekrarlanmadı.
+- Android Dart VM Service başladı, CameraX/ML Kit kamera açılışı
+  logları mevcut. Kullanıcı **gerçek QR tarama sonucunu** doğruladı.
+- **ANDROID_QR_LIVE_VERIFIED**: Windows ekranından Android scanner'a
+  tam metin okuma başarılı. Tek okutma için kanıt mevcut; birden çok
+  tekrarlı algılamada callback sayısı, izin reddi, yeniden scanner
+  açma, background/resume, iOS gerçek cihaz testi **henüz ayrıca
+  doğrulanmadı**.
+
+### Açılışta QR painter hatası (Android)
+
+Android ilk frame'inde `pretty_qr_code 3.6.0` için:
+`PrettyQrSquaresSymbol.paint` -> `clampDouble` assertion,
+`PrettyQrRenderView` constraints `BoxConstraints(w=0.0, h=250.0)`.
+Bu hata **gerçek logda var**, başarılı Android QR scan ile karıştırılmadı.
+
+- Düzeltme commit'i `ede14115110e7f9de50eb7abb87caf728945f4f5`.
+- `RemVibeUIQRCode` iç `LayoutBuilder` ile genişlik veya yükseklik
+  sıfırken `PrettyQrView` üretmiyor; geçerli ölçüler gelince çiziyor.
+- Root QR widget testine sıfır genişlikten geçerli ölçülere geçiş
+  senaryosu eklendi. Kütüphane bağımlılığı veya scanner callback'i
+  değişmedi.
+- **Bu düzeltmeden sonraki** `flutter analyze`, `flutter test` ve
+  Android uygulama açılışında assertion'ın tekrarlanmadığına dair
+  cihaz kanıtı **NOT_RUN / PENDING**.
+
+### Yerel Gradle dosyası
+
+Kullanıcının `git status --short` çıktısında
+`example/android/app/build.gradle.kts` yerel **modified**:
+`minSdk = 23` yerine `minSdk = flutter.minSdkVersion`.
+Değişiklik Flutter'ın önceki `Upgrading build.gradle.kts`
+davranışına bağlı görünüyor. Kullanıcının Android build'i
+**bu yerel değişiklikle** başarılı oldu.
+Bu yerel modifikasyon GitHub'a commit edilmiş varsayılmaz; otomatik
+`git restore` / override yapılmamalı. Pull öncesi mevcut diff gözden
+geçirilmeli. Native minSdk tutarlılığı sonraki incelemede çözülmeli.
+
 ## Sonraki hedef
 
-1. Kullanıcı yerelde `git status --short` ve gerekirse
-   `git diff -- example/android/app/build.gradle.kts` ile Flutter'ın
-   build sırasında bıraktığı değişiklikleri gözden geçirsin.
-2. Temiz/uyumlu working tree ile `git pull --ff-only origin
-   feature/initial-qr-widgets` çalıştırıp root `flutter test` tekrar etsin.
-3. `cd example`; `flutter clean`, `flutter pub get`,
-   `flutter run -d R58R50BT2BB` komutlarıyla Kotlin build ve
-   fiziksel Android kamera akışını tekrar doğrulasın.
-4. Başarılı Android live scan, izin yönetimi, one-shot callback ve
-   tekrar açma sonuçları gelene kadar Aşama 3 kapanmaz.
-5. Merge ve farklı checkpoint için ayrı kullanıcı onayı gerekir.
+1. Son QR painter fix commit'ini pull et; root `flutter analyze`,
+   `flutter test` ve Example analyze/test sonuçlarını al.
+2. Android'de `flutter run -d R58R50BT2BB` ile ilk frame paint
+   assertion'ın kalmadığını gözlemle; uygulama QR gösterebilir
+   ve scanner okumayı sürdürür.
+3. Gerekliyse one-shot tekrar algılama, yeni oturum açma,
+   izin reddi ve lifecycle senaryolarını gerçek cihazda doğrula.
+4. Gradle minSdk yerel diff'ini çözümle; user approval olmadan
+   sonraki checkpoint veya merge yapma.

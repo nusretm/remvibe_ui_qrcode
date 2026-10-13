@@ -3,7 +3,18 @@
 ## Unreleased
 
 ### Planned
-- Android scanner real-device camera validation and optional iOS device validation.
+- Android scanner lifecycle/one-shot edge-case checks and optional iOS device validation.
+
+### Android live scanner + initial QR layout guard — 2026-10-14
+- Root widget tests +3 PASS, Android Example debug APK build/install PASS.
+- Physical Samsung SM A515F (Android 13) scanned the Windows Example QR:
+  exact text `RemVibe UI QR` (ANDROID_QR_LIVE_VERIFIED).
+- Kotlin cross-drive cache failure no longer blocks Android debug build.
+- Android first-frame render assertion found at `PrettyQrView` width zero.
+- Add LayoutBuilder guard preventing Pretty QR painting until both layout
+  dimensions are positive, with a focused zero-width widget regression test.
+- This latest QR paint fix has not yet been re-analyzed, re-tested or
+  re-verified on Android; other scanner lifecycle/permission cases pending.
 
 ### Aşama 3 build/test düzeltmesi — 2026-10-14
 - Reset the desktop scanner widget-test platform override inside `try/finally`,
@@ -47,4 +58,4 @@
 - Record architecture, current target, platform contract, and verification status.
 - Draft README integration and native platform setup guide.
 
-> QR display is implemented, analyzed, tested and visually verified on Windows. Scanner implementation is present but not yet analyzed/tested or verified on a physical Android/iOS device. User-confirmed app closure explains the Windows debug disconnect.
+> QR display has been visually verified on Windows; Android scanner read succeeded on a physical Samsung device. Initial Android QR-paint zero-width assertion guard is committed but awaits device retest. iOS, Linux/macOS and lifecycle edge cases remain unverified.

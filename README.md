@@ -2,7 +2,8 @@
 
 **Durum: QR gösterme widget'ı Windows'ta gerçek ekranda görüntülendi;**
 kod, root/Example analyze ve odaklı testler başarılı. Android/iOS scanner
-kodu eklendi ancak yeni testler ve gerçek cihaz taraması henüz yapılmadı.
+kodu eklendi ve Samsung SM A515F / Android 13 ile Windows QR kodu
+başarıyla okunarak `RemVibe UI QR` metni elde edildi.
 Example uygulaması metin girip canlı QR önizlemesi gösterir ve
 Android/iOS/Windows/Linux/macOS native runner dosyalarını içerir.
 
@@ -12,7 +13,7 @@ Android/iOS/Windows/Linux/macOS native runner dosyalarını içerir.
   (`pretty_qr_code`).
 - `RemVibeUIQRScanner`: Android/iOS kamerasından QR okuyup
   `FutureOr<void> Function(String)` callback
-  (`mobile_scanner`, Aşama 3 uygulandı; Android canlı test bekleniyor).
+  (`mobile_scanner`; Android fiziksel cihaz QR taraması doğrulandı).
 
 Account/authentication, QR protocol, navigation, server API ve başka
 RemVibe package bağımlılığı içermez. QR içeriği otomatik olarak
@@ -29,8 +30,9 @@ yorumlanmaz, kaydedilmez veya loglanmaz.
 | iOS | Evet | Evet |
 | Web | Destek hedefi değil | Destek hedefi değil |
 
-QR gösterimi Windows'ta doğrulandı. Android/iOS scanner ve diğer hedef
-platformlarda gerçek çalışma henüz doğrulanmadı.
+QR gösterimi Windows'ta doğrulandı; Android kamera scanner'ı Samsung
+SM A515F / Android 13 üzerinde gerçek QR okuyarak doğrulandı.
+iOS, Linux, macOS cihaz testleri henüz yapılmadı.
 
 ## Flutter SDK ve kurulum
 
@@ -285,10 +287,12 @@ Aşama 2 değişiklikleri sonrasında root/Example analyzer ve testler yeniden
 QR kod ekranda görüntülendi. Debug bağlantısı kullanıcı uygulamayı
 kapattığından sona erdi (beklenen).
 
-Aşama 3 scanner kodu ve platform ayarları eklendi. Bu yeni değişiklikler
-için root/Example `flutter analyze`, `flutter test`, Windows unsupported
-UI kontrolü ve Android gerçek kamera doğrulaması **henüz yapılmadı**.
-Testleri root ve `example/` klasöründe yeniden çalıştırın.
+Aşama 3 scanner kodu ve native ayarlar sonrasında root `flutter test`
+**+3 PASS**; Android Example debug APK Samsung SM A515F / Android 13
+üzerinde kuruldu ve Windows'tan `RemVibe UI QR` metnini okudu.
+Daha önceki root/Example analyzer sonuçları PASS; son QR painter
+düzeltmesi sonrası analyzer/test ve Android açılış kontrolü henüz
+**yeniden çalıştırılmadı**.
 
 ### İlk Android kamera doğrulaması
 
@@ -347,6 +351,21 @@ flutter run -d R58R50BT2BB
 dosyalarını temizler; source dosyalarını veya Pub Cache'i silmez.
 Önceki `flutter run` yerel Gradle dosyasını yükselttiyse yeni pull
 öncesinde mutlaka `git status` ve `git diff` kontrol edilmelidir.
+
+### Android başlangıcında QR boyutu sıfır olabilir
+
+İlk gerçek Android çalıştırmasında, Example'ın QR önizlemesi başlangıç
+yerleşiminde geçici olarak `BoxConstraints(w=0.0, h=250.0)` aldı.
+`pretty_qr_code 3.6.0` sıfır genişlikte boyama assertion'ı üretti.
+Scanner buna rağmen Windows QR kodunu başarıyla okudu.
+
+Paket `RemVibeUIQRCode` içine `LayoutBuilder` koruması eklendi:
+QR ancak pozitif genişlik/yükseklikle çiziliyor. Geçerli layout
+geldiğinde QR normal biçimde görüntüleniyor.
+
+Bu fix henüz Android'de yeniden denenmedi. Pull sonrası root
+`flutter analyze`, `flutter test` ve fiziksel Android
+`flutter run -d R58R50BT2BB` ile tekrar doğrulanmalı.
 
 ## Development ve belgeler
 

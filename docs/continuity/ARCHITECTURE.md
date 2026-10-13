@@ -1,6 +1,6 @@
 # Architecture — RemVibe UI QR
 
-Durum: QR display **IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED** (Aşama 2); scanner **IMPLEMENTED / NOT_TESTED / NOT_LIVE_VERIFIED** (2026-10-14).
+Durum: QR display **IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED** (Aşama 2); scanner **IMPLEMENTED + TESTED + ANDROID_QR_LIVE_VERIFIED** (2026-10-14), Android QR painter initial-zero-size fix **PENDING_RETEST**.
 
 ## Sorumluluklar
 
@@ -9,7 +9,7 @@ remvibe_ui_qrcode/
   lib/remvibe_ui_qrcode.dart          # tek public export entrypoint
   lib/src/qr_code/                    # RemVibeUIQRCode
   lib/src/qr_scanner/                 # RemVibeUIQRScanner
-  example/                            # metin alanlı QR display Example; scanner daha sonra
+  example/                            # QR display + Android/iOS scanner Example
   test/                               # az sayıda odaklı widget testi
   docs/                               # proje kuralları ve continuity
 ```
@@ -170,3 +170,20 @@ ve optik QR okutma ayrıca doğrulanmadı.
   üst seviye Example `Last scanned QR` alanı yapar.
 - Test/cihaz durumu: kod **IMPLEMENTED**, yeni analiz/test ve native Android
   run **NOT_RUN**; canlı tarama `NOT_LIVE_VERIFIED`.
+
+## Aşama 3 cihaz kanıtı ve QR paint koruması (2026-10-14)
+
+- Root widget tests **+3 PASS**; Example Flutter Android debug APK
+  **BUILT/INSTALLED** on Samsung SM A515F, Android 13 (API 33).
+- Kullanıcı Windows ekranındaki QR'ı Android telefonun kamera scanner'ıyla
+  okutup `RemVibe UI QR` sonucunu aldı: **ANDROID_QR_LIVE_VERIFIED**.
+- Android açılışında `PrettyQrView` ilk frame'i `w=0.0, h=250.0`
+  layout ile render etmeye çalışırken `PrettyQrSquaresSymbol.paint`
+  assertion attı. Bu, scanner başarısından bağımsız gerçek bir bug.
+- `RemVibeUIQRCode` içine iç `LayoutBuilder` kontrolü eklendi:
+  iki boyut pozitif olmadan `PrettyQrView` çizilmez.
+  Width 0 -> width 250 geçişi için odaklı widget testi eklendi.
+- Guard fix commit `ede1411`. Guard sonrasında analiz/test ve fiziksel
+  Android initial-frame doğrulaması **PENDING**.
+- One-shot callback'in tekrarlar altında tek olayı, izin reddi,
+  background/resume, iOS ve diğer platformlar ayrıca live-verified değil.
