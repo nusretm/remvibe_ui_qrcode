@@ -1,6 +1,6 @@
 # Architecture — RemVibe UI QR
 
-Durum: QR display **IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED** (Aşama 2); scanner **IMPLEMENTED + TESTED + ANDROID_QR_LIVE_VERIFIED** (2026-10-14), Android QR painter initial-zero-size fix **PENDING_RETEST**.
+Durum: QR display **IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED** (Aşama 2); scanner **IMPLEMENTED + TESTED + ANDROID_QR_LIVE_VERIFIED** (2026-10-14); Android QR painter initial-zero-size guard **RETEST_PASS**.
 
 ## Sorumluluklar
 
@@ -187,3 +187,19 @@ ve optik QR okutma ayrıca doğrulanmadı.
   Android initial-frame doğrulaması **PENDING**.
 - One-shot callback'in tekrarlar altında tek olayı, izin reddi,
   background/resume, iOS ve diğer platformlar ayrıca live-verified değil.
+
+## Aşama 3 son cihaz retest (2026-10-14)
+
+- Root analyzer PASS; `flutter test` **+4 PASS**. Example analyzer PASS;
+  Example tests **+1 PASS**.
+- Android SM A515F debug `assembleDebug` ve APK installation PASS;
+  Flutter app/CameraX kamera başlangıcı gözlendi.
+- Önceki initial-layout `PrettyQrSquaresSymbol.paint` assertion'ı bu
+  son Android logunda **tekrarlanmadı**; guard regression PASS.
+- GPU `mali_winsys` log gürültüsü ve kamera kapanışında
+  `BufferQueue has been abandoned` görülse de raporlanan çalıştırmayı
+  durdurmadı. Önceki `RemVibe UI QR` optik okuma LIVE_VERIFIED korundu.
+- Son oturum için ayrıca taranan payload bilgisi, repeated callback count,
+  permission-denied, app lifecycle ve iOS çalışma kanıtı yok.
+- Yerel Flutter build tarafından modifiye edilen Gradle `minSdk` satırının
+  son working-tree durumu ayrıca kontrol edilmeli.

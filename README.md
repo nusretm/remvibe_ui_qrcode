@@ -290,9 +290,9 @@ kapattığından sona erdi (beklenen).
 Aşama 3 scanner kodu ve native ayarlar sonrasında root `flutter test`
 **+3 PASS**; Android Example debug APK Samsung SM A515F / Android 13
 üzerinde kuruldu ve Windows'tan `RemVibe UI QR` metnini okudu.
-Daha önceki root/Example analyzer sonuçları PASS; son QR painter
-düzeltmesi sonrası analyzer/test ve Android açılış kontrolü henüz
-**yeniden çalıştırılmadı**.
+Son QR painter düzeltmesinden sonra root `flutter analyze` PASS,
+`flutter test` +4 PASS; Example analyze PASS ve test +1 PASS.
+Android açılışı tekrar doğrulandı; QR paint assertion'ı tekrarlanmadı.
 
 ### İlk Android kamera doğrulaması
 
@@ -363,9 +363,11 @@ Paket `RemVibeUIQRCode` içine `LayoutBuilder` koruması eklendi:
 QR ancak pozitif genişlik/yükseklikle çiziliyor. Geçerli layout
 geldiğinde QR normal biçimde görüntüleniyor.
 
-Bu fix henüz Android'de yeniden denenmedi. Pull sonrası root
-`flutter analyze`, `flutter test` ve fiziksel Android
-`flutter run -d R58R50BT2BB` ile tekrar doğrulanmalı.
+Bu fix güncel branch'te root `flutter analyze` PASS, `flutter test` +4 PASS,
+Example analyzer PASS ve Example test +1 PASS sonuçlarıyla doğrulandı.
+Samsung SM A515F üzerinde APK tekrar çalıştırıldı; kamera açıldı ve önceki
+QR paint assertion'ı tekrar görülmedi. Bu son oturumda ayrıca QR okuma
+sonucu bildirilmedi; daha önce `RemVibe UI QR` başarıyla okutuldu.
 
 ## Development ve belgeler
 

@@ -24,7 +24,7 @@ Merge: kullanıcı onayı bekleniyor.
 | 0: AGENTS, çalışma kuralları, continuity, README başlangıcı | IMPLEMENTED (doc only; GitHub diff ve yerel temiz working tree kontrol edildi) | Commit `0e6aa97`; kullanıcı `git status` temiz olduğunu bildirdi |
 | 1: Flutter package temel dosyaları, pubspec ve bağımlılıklar | IMPLEMENTED + TESTED (Example shell), NATIVE_RUNNERS_COMMITTED; USER_CLOSED_WINDOW | `flutter pub get`, Example analyze/test, root analyze PASS; Windows build/VM Service başlangıcı PASS, sonra bağlantı kesildi |
 | 2: QR görüntüleme ve Example alanı | IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED | root analyze PASS; root tests +2; Example analyze PASS; Example tests +1; Windows QR kullanıcı tarafından ekranda görüldü; Windows uygulaması kullanıcı tarafından kapatıldı (EXPECTED_EXIT) |
-| 3: QR scanner ve Example alanı | IMPLEMENTED + TESTED + ANDROID_QR_LIVE_VERIFIED; QR_PAINT_FIX_RETEST_PENDING | root flutter test +3 PASS; Android debug APK build + install PASS; Samsung SM A515F Windows QR'ı taradı ve `RemVibe UI QR` elde edildi; ilk Android frame'inde ayrı QR paint assertion görüldü |
+| 3: QR scanner ve Example alanı | IMPLEMENTED + TESTED + ANDROID_QR_LIVE_VERIFIED; QR_PAINT_GUARD_RETEST_PASS | root analyze PASS / tests +4; Example analyze PASS / tests +1; Android APK build/install/camera PASS; önceki canlı okuma kanıtı geçerli; yeni Android logunda PrettyQr paint assertion tekrarlanmadı |
 | 4: diğer hedef platformlar ve odaklı testler | NOT_STARTED | platforma göre ayrı kayıt |
 | 5: README final, diff review, PR ve kullanıcı onayı | NOT_STARTED | gözden geçirilmiş PR; merge ayrı onaylı |
 
@@ -312,9 +312,9 @@ Bu hata **gerçek logda var**, başarılı Android QR scan ile karıştırılmad
 - Root QR widget testine sıfır genişlikten geçerli ölçülere geçiş
   senaryosu eklendi. Kütüphane bağımlılığı veya scanner callback'i
   değişmedi.
-- **Bu düzeltmeden sonraki** `flutter analyze`, `flutter test` ve
-  Android uygulama açılışında assertion'ın tekrarlanmadığına dair
-  cihaz kanıtı **NOT_RUN / PENDING**.
+- **Tarihsel kayıt:** düzeltme commit'i hemen sonrasında retest PENDING idi.
+  Kullanıcı sonraki çalıştırmada root/Example analiz ve testlerle Android
+  açılışını doğruladı. Sonuçlar aşağıdaki yeni doğrulama bölümünde.
 
 ### Yerel Gradle dosyası
 
@@ -328,14 +328,55 @@ Bu yerel modifikasyon GitHub'a commit edilmiş varsayılmaz; otomatik
 `git restore` / override yapılmamalı. Pull öncesi mevcut diff gözden
 geçirilmeli. Native minSdk tutarlılığı sonraki incelemede çözülmeli.
 
+## Aşama 3 — QR paint guard retest PASS (2026-10-14)
+
+**Kullanıcının yerel PowerShell çıktısı**, güncel commit
+`cb9f12f8a619769f05a1bc01edf0fe098379ec18` pull edildikten sonra:
+
+- `git pull --ff-only origin feature/initial-qr-widgets`: **PASS**,
+  `ee7e3ed..cb9f12f` fast-forward.
+- Root `flutter analyze`: **PASS**, No issues found (2.6s).
+- Root `flutter test`: **PASS**, `+4 All tests passed!`.
+  Sıfır genişlik QR görünümünü kapsayan regresyon testi eklendiği
+  haliyle başarılı.
+- Example `flutter analyze`: **PASS**, No issues found (1.7s).
+- Example `flutter test`: **PASS**, `+1 All tests passed!`.
+- `example/flutter run -d R58R50BT2BB`: Android Gradle
+  `assembleDebug` **PASS** (12.1s), APK **BUILT + INSTALLED**,
+  Android Dart VM Service başlatıldı.
+- Başlangıç Flutter engine logunda `Width is zero. 0,0`
+  görülmesi normal ilk boyutlandırma ile uyumlu. Önceki
+  `PrettyQrSquaresSymbol.paint` / `clampDouble` assertion'ı
+  **bu çalıştırmada tekrarlanmadı**.
+- Kamera CameraX grafiği açıldı, `CameraGraph-1` active oldu;
+  uygulama sonunda kapanış logları geldi (`Application finished.`).
+- Çok sayıda `mali_winsys: Unrecognised Android chroma siting range`
+  ve kamera kapanırken `BufferQueue has been abandoned` mesajı
+  kaydedildi; bu logda uygulamayı durdurmuş değiller. Ayrı
+  donanım/performans takibi gerektirirse yeni kanıt istenir.
+- **Yeni çalıştırmada ikinci QR okuma gözlemi bildirilmedi.**
+  Önceki başarılı Windows QR → Android `RemVibe UI QR` canlı
+  taraması `ANDROID_QR_LIVE_VERIFIED` olarak korunuyor.
+- One-shot tekrar algılama sayısı, scanner yeniden açma,
+  izin reddi, app background/resume ve iOS cihaz testi **NOT_VERIFIED**.
+- `example/android/app/build.gradle.kts` içindeki yerel
+  `minSdk = flutter.minSdkVersion` farkı önceki logdan biliniyor;
+  güncel `git status` çıktısı olmadığı için çözülmüş sayılmıyor.
+  Kullanıcı incelemesi olmadan yerel dosya restore edilmeyecek.
+
+**Aşama 3 temel kabulü:** QR scanner gerçek Android 13 cihazda
+çalıştı ve ham metni doğru iletti; kaynak analizi/testler ve son
+QR paint guard retest başarılı. Ek lifecycle senaryoları,
+iOS ve yerel Gradle diff'i release review için açık.
+
 ## Sonraki hedef
 
-1. Son QR painter fix commit'ini pull et; root `flutter analyze`,
-   `flutter test` ve Example analyze/test sonuçlarını al.
-2. Android'de `flutter run -d R58R50BT2BB` ile ilk frame paint
-   assertion'ın kalmadığını gözlemle; uygulama QR gösterebilir
-   ve scanner okumayı sürdürür.
-3. Gerekliyse one-shot tekrar algılama, yeni oturum açma,
-   izin reddi ve lifecycle senaryolarını gerçek cihazda doğrula.
-4. Gradle minSdk yerel diff'ini çözümle; user approval olmadan
-   sonraki checkpoint veya merge yapma.
+1. Kullanıcı `git status --short` ve
+   `git diff -- example/android/app/build.gradle.kts` ile
+   Flutter'ın yerel Android minSdk güncellemesini gözden geçirsin.
+   Native `minSdk` minimumunun 23 olarak kaldığı doğrulansın.
+2. Aşama 3 temel kabulü doğrulandı. İsteğe bağlı Android one-shot
+   tekrar okuma/yeniden açma, izin reddi ve background/resume
+   koşulları ayrı manuel kanıt olarak kaydedilebilir.
+3. Bir sonraki checkpoint/PR/merge kullanıcıdan **ayrı açık onay**
+   bekler; iOS/Linux/macOS için doğrulanmamış test sonucu yazılmaz.

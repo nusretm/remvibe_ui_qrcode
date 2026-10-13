@@ -13,8 +13,11 @@
 - Android first-frame render assertion found at `PrettyQrView` width zero.
 - Add LayoutBuilder guard preventing Pretty QR painting until both layout
   dimensions are positive, with a focused zero-width widget regression test.
-- This latest QR paint fix has not yet been re-analyzed, re-tested or
-  re-verified on Android; other scanner lifecycle/permission cases pending.
+- QR paint guard retest: root analyze PASS / tests +4 PASS, Example
+  analyze PASS / tests +1 PASS, Samsung Android debug APK build/install
+  and camera startup PASS; the previous paint assertion did not recur.
+- The final run did not report another scanned payload; prior successful
+  optical QR read remains valid. Lifecycle/permission edge cases pending.
 
 ### Aşama 3 build/test düzeltmesi — 2026-10-14
 - Reset the desktop scanner widget-test platform override inside `try/finally`,
@@ -58,4 +61,4 @@
 - Record architecture, current target, platform contract, and verification status.
 - Draft README integration and native platform setup guide.
 
-> QR display has been visually verified on Windows; Android scanner read succeeded on a physical Samsung device. Initial Android QR-paint zero-width assertion guard is committed but awaits device retest. iOS, Linux/macOS and lifecycle edge cases remain unverified.
+> QR display is verified on Windows; Android scanner successfully read a Windows QR on Samsung. Initial Android zero-width QR paint guard now passed tests and an Android device run without recurring paint assertion. iOS, Linux/macOS and lifecycle edge cases remain unverified.
