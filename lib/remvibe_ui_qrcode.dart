@@ -1,4 +1,6 @@
-/// Reusable Flutter QR display and mobile scanning widgets.
+/// Simple, reusable QR widgets for Flutter.
 ///
-/// The public widgets will be exported when their checkpoints are implemented.
+/// Camera scanning will be exported when its checkpoint is implemented.
 library;
+
+export 'src/qr_code/remvibe_ui_qr_code.dart';
