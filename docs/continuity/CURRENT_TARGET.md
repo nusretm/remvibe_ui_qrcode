@@ -22,7 +22,7 @@ Merge: kullanıcı onayı bekleniyor.
 | Adım | Durum | Kabul kanıtı |
 | --- | --- | --- |
 | 0: AGENTS, çalışma kuralları, continuity, README başlangıcı | IMPLEMENTED (doc only; GitHub diff ve yerel temiz working tree kontrol edildi) | Commit `0e6aa97`; kullanıcı `git status` temiz olduğunu bildirdi |
-| 1: Flutter package temel dosyaları, pubspec ve bağımlılıklar | IMPLEMENTED + TESTED (yerel Example shell); NATIVE_RUNNERS_UNTRACKED / RUN_DISCONNECT_UNRESOLVED | `flutter pub get`, Example analyze/test, root analyze PASS; Windows build/VM Service başlangıcı PASS, sonra bağlantı kesildi |
+| 1: Flutter package temel dosyaları, pubspec ve bağımlılıklar | IMPLEMENTED + TESTED (Example shell), NATIVE_RUNNERS_COMMITTED; RUN_DISCONNECT_UNRESOLVED | `flutter pub get`, Example analyze/test, root analyze PASS; Windows build/VM Service başlangıcı PASS, sonra bağlantı kesildi |
 | 2: QR görüntüleme ve Example alanı | NOT_STARTED | Windows QR gösterimi |
 | 3: QR scanner ve Example alanı | NOT_STARTED | Android gerçek kamera okumayı doğrulama |
 | 4: diğer hedef platformlar ve odaklı testler | NOT_STARTED | platforma göre ayrı kayıt |
@@ -55,7 +55,7 @@ Merge: kullanıcı onayı bekleniyor.
 - Root `flutter analyze`: **PASS**.
 - Windows Example native build: **PASS**; Dart VM Service başladı, ardından `Lost connection to device` görüldü. Kalıcı oturum **UNRESOLVED**.
 - Flutter/Dart/YAML scaffold GitHub üzerinden oluşturuldu: `pubspec.yaml`, `analysis_options.yaml`, `.gitignore`, public library entrypoint, `example/pubspec.yaml`, `example/lib/main.dart`, minimal Example smoke testi.
-- Example `android/`, `ios/`, `windows/`, `linux/`, `macos/` native runner klasörleri **kullanıcının yerel ortamında** `flutter create` ile oluşturuldu (120 dosya); `git status` üzerinde untracked. Bu dosyalar henüz GitHub'a commit edilmedi.
+- Example `android/`, `ios/`, `windows/`, `linux/`, `macos/` native runner klasörleri **kullanıcının yerel ortamında** `flutter create` ile oluşturuldu (120 dosya raporu); bunlardan commit kapsamına giren 119 yeni dosya GitHub `7882a42` commit'inde **COMMITTED**.
 - Windows gerçek QR görünümü: **NOT_RUN**.
 - Android fiziksel kamera taraması: **NOT_RUN**.
 - iOS/Linux/macOS: **NOT_RUN**.
@@ -106,20 +106,39 @@ ChatGPT ortamında yerel Flutter komutu çalıştırıldığı iddia edilmez.
 - Example `flutter test`: PASS (+1 All tests passed).
 - Example `flutter run -d windows`: BUILD_VERIFIED; exe oluşturuldu, Dart VM Service açıldı ve dosyalar cihaza eşitlendi; ardından `Lost connection to device` mesajı geldi. Bunun kullanıcı tarafından pencere kapatılması mı veya runtime problemi mi olduğu bilinmiyor: UNRESOLVED. Kararlı pencere/etkileşim LIVE_VERIFIED sayılmaz.
 - Root `flutter analyze`: PASS (No issues found).
-- `git status`: mevcut tracked dosyalarda değişiklik bildirilmedi; Example native runner klasörleri, `example/.gitignore`, `example/.metadata`, `example/README.md`, `example/pubspec.lock` untracked.
+- İlk `git status`: native runner'lar ve Example metadata/lockfile untracked idi. Kullanıcı bunları sonradan `7882a42` ile remote'a push etti.
 - Android cihaz, iOS/Linux/macOS native build, QR gösterme/tarama: NOT_RUN.
 - 10 newer dependency uyarısı bağımlılık çözümleme başarısızlığı değildir.
 
-### Checkpoint kapanışı için kalan iş
+### Native runner push ve GitHub incelemesi (2026-10-14)
 
-1. GitHub continuity değişikliğini yerel branch'e çek.
-2. Yerel üretilen native dosyaları, Example metadata ve uygulama lockfile'ını stage et. `git diff --cached --check`, `git diff --cached --stat`, `git status` ile kontrol et; build, .idea ve .dart_tool dosyalarını commit etme.
-3. Native dosyaları feature branch'e commit/push et.
-4. Gerekirse Windows Example penceresi bağlantısının neden kesildiğini ayrı doğrula. Şimdilik kararlı LIVE_VERIFIED demiyoruz.
+- Kullanıcının `git push origin feature/initial-qr-widgets` çıktısı:
+  `71d00c8..7882a42` — **PASS**.
+- GitHub HEAD: `7882a42a0be8f58f4b6abf893a12ac22c379a975`;
+  commit başlığı `chore: add Flutter example platform runners`.
+- `71d00c8..7882a42` diff: **119 yeni dosya**, yalnız Example
+  Android/iOS/Windows/Linux/macOS runner kaynakları, Flutter metadata,
+  uygulama `pubspec.lock`, platform asset'leri ve template dosyaları.
+- İncelemede `build/`, `.dart_tool/`, `.idea/` veya yerel Android
+  SDK `local.properties` commit edilmiş olarak görülmedi.
+- `example/ios/Runner/Info.plist` içinde `NSCameraUsageDescription`
+  **henüz yok**; scanner'ın Aşama 3 implementasyonunda eklenecek.
+- Android Example `minSdk = flutter.minSdkVersion` kullanıyor;
+  scanner için Android 23+ koşulu Aşama 3 native build ile doğrulanacak.
+- Windows Example başlatılmasında daha önce görülen `Lost connection
+  to device` nedeni **UNRESOLVED**; kalıcı/pencere etkileşimi
+  `LIVE_VERIFIED` ilan edilmedi.
+- Aşama 1 sonucu: **IMPLEMENTED + TESTED (shell/Windows build)**.
+  Android/iOS kamera veya QR davranışı **NOT_STARTED / NOT_RUN**.
 
 ## Sonraki hedef
 
-1. Üretilen native runner dosyaları, Example lockfile ve metadata Git diff üzerinden kontrol edilip feature branch'e push edilsin.
-2. Windows Example bağlantısının kesilme nedeni gerekiyorsa kısa tekrar denemeyle netleştirilsin; Aşama 1 kapatılsın.
-3. Sonraki ayrı onayla Aşama 2 `RemVibeUIQRCode` implementasyonuna başla;
-   ilk gerçek Windows QR görüntüleme sonucu continuity'de saklanacak.
+1. **Aşama 1 kapandı**: Example runner'lar GitHub'a aktarıldı;
+   dependency/analyzer/test/Windows build kanıtları kaydedildi.
+2. Kullanıcı yeni checkpoint'i **açıkça onaylarsa** Aşama 2
+   `RemVibeUIQRCode` ve Example metin/QR görünümü uygulanacak.
+3. İlk gerçek Windows QR gösterimi ve Windows pencere bağlantısı/
+   yaşam döngüsü gözlemi kaydedilecek. Önceki disconnect,
+   QR görüntüleme kanıtıyla otomatik çözülmüş sayılmayacak.
+4. Aşama 3 scanner başlamadan önce iOS kamera izin açıklaması ve
+   Android native build koşulları tamamlanacak.

@@ -2,8 +2,8 @@
 
 **Durum: Aşama 1 Flutter iskeleti eklendi; QR widget'lar henüz uygulanmadı.**
 Bu branch proje kurallarını, pubspec bağımlılıklarını, mimariyi ve bir Example
-uygulaması Dart iskeletini içerir. Native Example runner klasörleri yerel
-Flutter CLI ile henüz üretilmedi. Aşağıdaki QR widget kodları **hedef API
+uygulaması Dart iskeletini ve Android/iOS/Windows/Linux/macOS native
+Example runner klasörlerini içerir. Aşağıdaki QR widget kodları **hedef API
 örnekleridir**; Aşama 2–3 tamamlanmadan çalışacakları iddia edilmez.
 
 İki bağımsız Flutter widget'ı:
@@ -205,8 +205,8 @@ macOS taraması hedeflemez.
 - Linux: `flutter run -d linux`
 - macOS: `flutter run -d macos`
 
-Bu komutlar Example oluşturulduktan sonra Example klasöründe
-çalıştırılacak; henüz çalıştırılmadı.
+Windows için Example shell build ve başlangıç çalıştırması denendi;
+Linux/macOS henüz çalıştırılmadı.
 
 ### Web
 
@@ -220,12 +220,10 @@ Aşama 1'de `example/lib/main.dart` temel uygulama kabuğu oluşturuldu.
 Aşama 2–3'te metin alanından QR gösterme, scanner kamera alanı,
 okunan metin, izin reddi ve unsupported UI eklenecek.
 
-İlk çalıştırma için **Flutter 3.44.9 kurulu geliştirme makinesinde** proje
-kökünden native runner oluşturulmalıdır. Komut mevcut Dart/YAML dosyalarını
-koruyacak şekilde (`--overwrite` olmadan) çalıştırılır:
+Native runner klasörleri feature branch'te mevcuttur; yeni clone için
+`flutter create` çalıştırmaya gerek yoktur. Example'ı çalıştırmak için:
 
 ```powershell
-flutter create --platforms=android,ios,windows,linux,macos --project-name=remvibe_ui_qrcode_example example
 flutter pub get
 cd example
 flutter pub get
@@ -234,20 +232,15 @@ flutter test
 flutter run -d windows
 ```
 
-Native runner dosyaları branch'te kaydedilene kadar Example'ın Windows'ta
-çalıştığı iddia edilmez. Sonraki çalışmalar için hedef komutlar:
+Aşama 1'in kullanıcı tarafından raporlanan doğrulamaları:
+`flutter pub get` (root/Example), `flutter analyze` (root/Example),
+`flutter test` (+1), Windows native build ve VM Service başlangıcı
+başarılı. Windows debug oturumu daha sonra `Lost connection to device`
+ile sonlandı; kesintisiz çalışma **henüz doğrulanmadı**.
 
-```sh
-cd example
-flutter pub get
-flutter run -d windows
-flutter run -d android
-```
-
-Aşama 1'deki analyzer/test/run komutları henüz çalıştırılmadı.
-Sonraki checkpoint'lerde `flutter test`, `flutter analyze`,
-`dart analyze` ve gerçek cihaz kontrollerinin sonuçları ayrı ayrı
-`docs/continuity/CURRENT_TARGET.md` dosyasına yazılacaktır.
+QR üretme/tarama davranışı henüz kodlanmadığı için bunlar yalnız Example
+shell ve package altyapısı sonuçlarıdır. Scanner için Android/iOS gerçek
+cihaz doğrulaması Aşama 3'te yapılacaktır.
 
 ## Development ve belgeler
 

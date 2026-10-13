@@ -116,5 +116,6 @@ app resumed ve hâlâ bekleniyorsa -> güvenli şekilde devam et
 
 - Root `pubspec.yaml`, `analysis_options.yaml`, `.gitignore` ve public library dosyası mevcut.
 - `example/pubspec.yaml`, `example/lib/main.dart`, küçük Example smoke testi mevcut.
-- Android/iOS/Windows/Linux/macOS Example runner'ları Flutter CLI ile yerelde üretilecek; henüz commit edilmedi.
-- Public widget implementasyonu, kamera controller ve platform native izin değişiklikleri henüz yok.
+- Android/iOS/Windows/Linux/macOS Example runner'ları Flutter CLI ile oluşturuldu ve `7882a42` commit'inde GitHub'a aktarıldı.
+- Example `flutter analyze`, `flutter test` (+1), root `flutter analyze` ve Windows Example native build kullanıcı tarafından başarılı çalıştırıldı. Windows run bağlantısının kesilme nedeni çözümlenmedi.
+- Public widget implementasyonu, kamera controller ve platform native izin değişiklikleri henüz yok; iOS `NSCameraUsageDescription` Aşama 3 için bekliyor.
