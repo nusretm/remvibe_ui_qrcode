@@ -3,7 +3,7 @@
 Tarih: 2026-10-14
 Repository: https://github.com/nusretm/remvibe_ui_qrcode
 Package adı: `remvibe_ui_qrcode`
-Onaylanan kapsam: **Aşama 1**, Flutter package ve Example iskeleti (widget davranışı hariç).
+Onaylanan kapsam: **Aşama 2**, yalnız QR gösterimi ve Example metin/önizleme.
 Aktif branch: `feature/initial-qr-widgets`.
 Merge: kullanıcı onayı bekleniyor.
 
@@ -23,7 +23,7 @@ Merge: kullanıcı onayı bekleniyor.
 | --- | --- | --- |
 | 0: AGENTS, çalışma kuralları, continuity, README başlangıcı | IMPLEMENTED (doc only; GitHub diff ve yerel temiz working tree kontrol edildi) | Commit `0e6aa97`; kullanıcı `git status` temiz olduğunu bildirdi |
 | 1: Flutter package temel dosyaları, pubspec ve bağımlılıklar | IMPLEMENTED + TESTED (Example shell), NATIVE_RUNNERS_COMMITTED; RUN_DISCONNECT_UNRESOLVED | `flutter pub get`, Example analyze/test, root analyze PASS; Windows build/VM Service başlangıcı PASS, sonra bağlantı kesildi |
-| 2: QR görüntüleme ve Example alanı | NOT_STARTED | Windows QR gösterimi |
+| 2: QR görüntüleme ve Example alanı | IMPLEMENTED / NOT_TESTED / NOT_LIVE_VERIFIED | QR sınıfı + Example metin alanı + iki odaklı test; Windows gerçek QR görünümü bekleniyor |
 | 3: QR scanner ve Example alanı | NOT_STARTED | Android gerçek kamera okumayı doğrulama |
 | 4: diğer hedef platformlar ve odaklı testler | NOT_STARTED | platforma göre ayrı kayıt |
 | 5: README final, diff review, PR ve kullanıcı onayı | NOT_STARTED | gözden geçirilmiş PR; merge ayrı onaylı |
@@ -131,14 +131,41 @@ ChatGPT ortamında yerel Flutter komutu çalıştırıldığı iddia edilmez.
 - Aşama 1 sonucu: **IMPLEMENTED + TESTED (shell/Windows build)**.
   Android/iOS kamera veya QR davranışı **NOT_STARTED / NOT_RUN**.
 
+## Aşama 2 uygulama kaydı (2026-10-14)
+
+**Açık kullanıcı onayı:** Aşama 2 `RemVibeUIQRCode` implementasyonu.
+**Branch:** `feature/initial-qr-widgets`.
+**Kaynak commit:** `690e6ab07e91969ca1c6230ad77163c9730441e6`.
+
+- Kaynak: `lib/src/qr_code/remvibe_ui_qr_code.dart`; public export
+  `lib/remvibe_ui_qrcode.dart` içine eklendi.
+- API: `RemVibeUIQRCode(data: String, size: double = 250)`.
+- `PrettyQrView.data` kullanılır; upstream v3.6.0 kendi State'inde
+  data değişimlerinde QR matrisini yeniler.
+- `PrettyQrDecoration`: siyah kare modüller, beyaz arka plan, dört modüllük
+  standart quiet zone. Network veya kamera erişimi yok.
+- Boş veri, geçersiz boyut, QR encode/capacity hatası için ayrı,
+  içerik sızdırmayan hata görünümleri. Payload loglanmaz.
+- Example `example/lib/main.dart` içinde `TextField` ve anlık QR önizlemesi
+  eklenmiştir; scanner bu checkpoint dışında tutulmuştur.
+- Root `test/remvibe_ui_qr_code_test.dart`: QR/boş içerik geçişi ve
+  kapasite taşması kontrolü; Example `example/test/widget_test.dart`:
+  metin değişimlerini kapsar.
+- Production dependency eklenmedi, `pubspec.yaml` değiştirilmedi.
+- Gerçek `flutter analyze`, `flutter test`, Windows QR run
+  **NOT_RUN** (kullanıcının yerel ortamında beklenecek).
+- Önceki Aşama 1 Windows bağlantı kesilmesi hâlâ **UNRESOLVED**;
+  yeni QR görüntüleme sonucu bu sorunu ayrıca değerlendirecek.
+
 ## Sonraki hedef
 
-1. **Aşama 1 kapandı**: Example runner'lar GitHub'a aktarıldı;
-   dependency/analyzer/test/Windows build kanıtları kaydedildi.
-2. Kullanıcı yeni checkpoint'i **açıkça onaylarsa** Aşama 2
-   `RemVibeUIQRCode` ve Example metin/QR görünümü uygulanacak.
-3. İlk gerçek Windows QR gösterimi ve Windows pencere bağlantısı/
-   yaşam döngüsü gözlemi kaydedilecek. Önceki disconnect,
-   QR görüntüleme kanıtıyla otomatik çözülmüş sayılmayacak.
-4. Aşama 3 scanner başlamadan önce iOS kamera izin açıklaması ve
-   Android native build koşulları tamamlanacak.
+1. Kullanıcı branch'i pull edip root `flutter analyze`, `flutter test`,
+   Example `flutter analyze` ve `flutter test` çalıştırsın.
+2. Windows `flutter run -d windows` ile canlı QR render, metin değişimi,
+   boş metin ve kapasite taşması incelensin. Önceki Windows disconnect
+   ayrı açık sonuca bağlansın.
+3. Sonuçları bu continuity belgesine geçir; Aşama 2'yi ancak kanıt
+   sonrası `TESTED` / `LIVE_VERIFIED` ilan et.
+4. Aşama 3 Android/iOS scanner için ayrı kullanıcı onayı beklenecek;
+   iOS `NSCameraUsageDescription` ve Android native build gereksinimleri
+   o aşamada ele alınacak.

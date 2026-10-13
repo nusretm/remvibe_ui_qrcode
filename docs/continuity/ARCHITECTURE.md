@@ -1,6 +1,6 @@
 # Architecture — RemVibe UI QR
 
-Durum: QR widget API **DESIGNED**; package ve Example Dart iskeleti **IMPLEMENTED**, widget kodu henüz uygulanmadı (2026-10-14).
+Durum: QR display **IMPLEMENTED / NOT_TESTED** (Aşama 2); scanner **DESIGNED / NOT_STARTED** (2026-10-14).
 
 ## Sorumluluklar
 
@@ -9,7 +9,7 @@ remvibe_ui_qrcode/
   lib/remvibe_ui_qrcode.dart          # tek public export entrypoint
   lib/src/qr_code/                    # RemVibeUIQRCode
   lib/src/qr_scanner/                 # RemVibeUIQRScanner
-  example/                            # MaterialApp shell (QR demo eklenecek)
+  example/                            # metin alanlı QR display Example; scanner daha sonra
   test/                               # az sayıda odaklı widget testi
   docs/                               # proje kuralları ve continuity
 ```
@@ -48,9 +48,13 @@ RemVibeUIQRScanner(
 ```
 
 - QR display: `data` required `String`, `size` opsiyonel `double`
-  (varsayılan 250); içerik güncellendiğinde yeni görsel çizilir.
-- Görsel: okunabilir koyu modüller / açık arka plan, yeterli quiet zone.
-  Boş, aşırı uzun veya geçersiz QR verisinde kontrollü hata görünümü.
+  (varsayılan 250). Stateless wrapper; `PrettyQrView.data` kendi
+  state'i üzerinden `data` değişikliklerinde matrisi günceller.
+- Görsel: siyah kare modüller, beyaz arka plan, standart **4-modül quiet zone**.
+  Boş metinde ayrı fallback; kodlama veya kapasite hatasında
+  `PrettyQrView.data(errorBuilder: ...)` ile güvenli fallback.
+  Hata mesajında QR payload'u yok; exception loglanmaz.
+- Sıfır, negatif veya sonlu olmayan boyutta kontrollü hata metni gösterilir.
 - QR scanner: `onRead` required `FutureOr<void> Function(String data)`.
   String hiçbir şekilde parse/yorumlanmaz, loglanmaz veya sunucuya gönderilmez.
 - İlk API'de zorunlu olmayan controller/configuration/error callback bulunmaz.
@@ -119,3 +123,16 @@ app resumed ve hâlâ bekleniyorsa -> güvenli şekilde devam et
 - Android/iOS/Windows/Linux/macOS Example runner'ları Flutter CLI ile oluşturuldu ve `7882a42` commit'inde GitHub'a aktarıldı.
 - Example `flutter analyze`, `flutter test` (+1), root `flutter analyze` ve Windows Example native build kullanıcı tarafından başarılı çalıştırıldı. Windows run bağlantısının kesilme nedeni çözümlenmedi.
 - Public widget implementasyonu, kamera controller ve platform native izin değişiklikleri henüz yok; iOS `NSCameraUsageDescription` Aşama 3 için bekliyor.
+
+## Aşama 2 uygulama kaydı — 2026-10-14
+
+- Public `lib/remvibe_ui_qrcode.dart` yalnız `RemVibeUIQRCode` export eder.
+- Kaynak: `lib/src/qr_code/remvibe_ui_qr_code.dart`; servis/controller yok.
+- Example metin denetleyicisinin sahibi `_QRCodeDemoPageState`; controller
+  `dispose` edilir. Metin değişince widget yeni `data` ile yeniden çizilir.
+- Focused root widget testi ve Example metin düzenleme testi eklendi.
+- `flutter test` ve `flutter analyze` bu değişiklikler sonrası NOT_RUN.
+- Windows'ta gerçek QR görüntüleme **NOT_RUN**; eski Example shell
+  disconnect kaydı çözülmedi.
+- Scanner, kamera izinleri veya native platform dosyaları bu checkpoint'te
+  değiştirilmedi.

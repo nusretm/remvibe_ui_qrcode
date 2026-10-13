@@ -1,10 +1,9 @@
 # RemVibe UI QR
 
-**Durum: Aşama 1 Flutter iskeleti eklendi; QR widget'lar henüz uygulanmadı.**
-Bu branch proje kurallarını, pubspec bağımlılıklarını, mimariyi ve bir Example
-uygulaması Dart iskeletini ve Android/iOS/Windows/Linux/macOS native
-Example runner klasörlerini içerir. Aşağıdaki QR widget kodları **hedef API
-örnekleridir**; Aşama 2–3 tamamlanmadan çalışacakları iddia edilmez.
+**Durum: QR gösterme widget'ı uygulandı; gerçek Windows QR görüntüleme
+doğrulaması bekleniyor.** Android/iOS scanner henüz uygulanmadı.
+Example uygulaması metin girip canlı QR önizlemesi gösterir ve
+Android/iOS/Windows/Linux/macOS native runner dosyalarını içerir.
 
 İki bağımsız Flutter widget'ı:
 
@@ -64,7 +63,7 @@ Paket henüz `publish_to: none` olarak işaretli, yayımlanmıyor.
 Yayımlama tamamlanmadan `pub.dev` üzerinden
 `remvibe_ui_qrcode: ^...` kullanımı vaat edilmez.
 
-## QR gösterme — planlanan API
+## QR gösterme — uygulanan API
 
 ```dart
 import 'package:flutter/material.dart';
@@ -85,10 +84,25 @@ class QRPreview extends StatelessWidget {
 }
 ```
 
-`data` değişince QR yenilenir. Boş/geçersiz veya kapasiteyi aşan
-içerikler kontrollü hata görünümüne dönüşür. Quiet zone ve yüksek kontrast
-varsayılan olarak korunur. QR gösterimi herhangi bir kamera izni veya
-uzak sunucu gerektirmez.
+`data` değişince QR yenilenir; içeriğin kendisi değiştirilmez, parse
+edilmez veya loglanmaz. Varsayılan `size` 250 logical pixel'dir.
+`size` pozitif ve sonlu bir sayı olmalıdır.
+
+QR tam siyah modüller, beyaz arka plan ve standart **dört modüllük quiet
+zone** ile çizilir. Boş metinde `QR content cannot be empty.`,
+QR kapasitesini aşan veya kodlanamayan metinde
+`QR content could not be encoded.` mesajı gösterilir.
+Hata içeriği veya kullanıcı verisi otomatik olarak loglanmaz.
+QR görüntüleme kamera izni veya uzak sunucu gerektirmez.
+
+**Example:** `example/lib/main.dart` içinde bir metin alanı bulunur.
+Alan değiştikçe `RemVibeUIQRCode` yeni içeriği gösterir. Scanner'a ait
+Example bölümü Aşama 3'te eklenecek.
+
+> Aşama 2 kodu GitHub'a işlendi ancak yeni `flutter analyze`,
+> `flutter test` ve Windows üzerinde gerçek QR görüntüleme henüz
+> çalıştırılmadı. Windows Example'ın önceki debug bağlantı kesilmesi
+> ayrıca açık doğrulama konusudur.
 
 ## QR okuma — planlanan API (Android / iOS)
 
@@ -216,9 +230,9 @@ desteği olması bu package için Web test/destek taahhüdü değildir.
 ## Example uygulaması ve doğrulama
 
 Aşama 1'de `example/lib/main.dart` temel uygulama kabuğu oluşturuldu.
-Şimdilik QR üretme/tarama değil, geliştirme durumunu gösterir.
-Aşama 2–3'te metin alanından QR gösterme, scanner kamera alanı,
-okunan metin, izin reddi ve unsupported UI eklenecek.
+Aşama 2'de metin alanı ve QR önizlemesi eklendi.
+Aşama 3'te scanner kamera alanı, okunan metin, izin reddi ve
+unsupported UI eklenecek.
 
 Native runner klasörleri feature branch'te mevcuttur; yeni clone için
 `flutter create` çalıştırmaya gerek yoktur. Example'ı çalıştırmak için:
@@ -238,9 +252,10 @@ Aşama 1'in kullanıcı tarafından raporlanan doğrulamaları:
 başarılı. Windows debug oturumu daha sonra `Lost connection to device`
 ile sonlandı; kesintisiz çalışma **henüz doğrulanmadı**.
 
-QR üretme/tarama davranışı henüz kodlanmadığı için bunlar yalnız Example
-shell ve package altyapısı sonuçlarıdır. Scanner için Android/iOS gerçek
-cihaz doğrulaması Aşama 3'te yapılacaktır.
+Bu sonuçlar yalnız Aşama 1 Example shell için geçerlidir. Yeni QR widget
+ile `flutter analyze`, `flutter test` (root ve Example) ve
+`flutter run -d windows` **yeniden çalıştırılmalıdır**. Scanner için
+Android/iOS gerçek cihaz doğrulaması Aşama 3'te yapılacaktır.
 
 ## Development ve belgeler
 

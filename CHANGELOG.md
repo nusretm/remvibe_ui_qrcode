@@ -3,9 +3,16 @@
 ## Unreleased
 
 ### Planned
-- `RemVibeUIQRCode` display widget backed by `pretty_qr_code`.
 - `RemVibeUIQRScanner` Android/iOS one-shot scanner backed by `mobile_scanner`.
 - Runnable Example app and real Windows / Android validation.
+
+### QR display (Aşama 2) — 2026-10-14
+- Add `RemVibeUIQRCode(data: ..., size: 250)` using `pretty_qr_code 3.6.0`.
+- Preserve a four-module quiet zone and black-on-white contrast.
+- Show safe fallback for empty, unencodable, or over-capacity contents.
+- Replace Example placeholder with editable text and QR preview.
+- Add focused root QR and Example interaction tests (not yet executed).
+- Windows QR display live validation and new analyze/test runs are pending.
 
 ### Package/Example scaffold — 2026-10-14
 - Add Flutter package `pubspec.yaml`, public library entrypoint and lints.
@@ -21,4 +28,4 @@
 - Record architecture, current target, platform contract, and verification status.
 - Draft README integration and native platform setup guide.
 
-> QR widgets and device scanner are not implemented or live-verified. Example runner templates and a Windows shell build are present; the Windows run disconnect remains unresolved.
+> The QR-display source is implemented but not yet analyzed/tested or live-verified. Scanner is not implemented. The earlier Windows Example shell run disconnect remains unresolved.
