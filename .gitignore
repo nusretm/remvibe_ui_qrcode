@@ -1,0 +1,31 @@
+# Generated Flutter / Dart artifacts.
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/build/
+**/coverage/
+**/.pub/
+
+# Libraries do not commit the root dependency lockfile; the Example app does.
+# Do not ignore example/pubspec.lock.
+/pubspec.lock
+
+# Tooling and editor caches.
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Native generated / local machine artifacts.
+**/.gradle/
+**/local.properties
+**/Pods/
+**/DerivedData/
+**/Flutter/ephemeral/
+**/flutter/ephemeral/
+**/Generated.xcconfig
+**/flutter_export_environment.sh
+
+# Keep source files, native manifests, Gradle wrappers and project metadata tracked.
