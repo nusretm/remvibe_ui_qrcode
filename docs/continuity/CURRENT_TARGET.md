@@ -1,9 +1,9 @@
 # Current target — RemVibe UI QR
 
-Tarih: 2026-10-13
+Tarih: 2026-10-14
 Repository: https://github.com/nusretm/remvibe_ui_qrcode
 Package adı: `remvibe_ui_qrcode`
-Onaylanan kapsam: yalnız **Aşama 0**, çalışma kuralları ve continuity/başlangıç README.
+Onaylanan kapsam: **Aşama 1**, Flutter package ve Example iskeleti (widget davranışı hariç).
 Aktif branch: `feature/initial-qr-widgets`.
 Merge: kullanıcı onayı bekleniyor.
 
@@ -22,7 +22,7 @@ Merge: kullanıcı onayı bekleniyor.
 | Adım | Durum | Kabul kanıtı |
 | --- | --- | --- |
 | 0: AGENTS, çalışma kuralları, continuity, README başlangıcı | IMPLEMENTED (doc only; GitHub diff ve yerel temiz working tree kontrol edildi) | Commit `0e6aa97`; kullanıcı `git status` temiz olduğunu bildirdi |
-| 1: Flutter package temel dosyaları, pubspec ve bağımlılıklar | NOT_STARTED | flutter pub get + SDK bilgisi |
+| 1: Flutter package temel dosyaları, pubspec ve bağımlılıklar | IMPLEMENTED (Dart/YAML scaffold); NATIVE_RUNNERS_PENDING / NOT_TESTED | Commit `c3085bb`; yerel `flutter create` + `pub get` ve analyzer sonuçları henüz bekleniyor |
 | 2: QR görüntüleme ve Example alanı | NOT_STARTED | Windows QR gösterimi |
 | 3: QR scanner ve Example alanı | NOT_STARTED | Android gerçek kamera okumayı doğrulama |
 | 4: diğer hedef platformlar ve odaklı testler | NOT_STARTED | platforma göre ayrı kayıt |
@@ -35,7 +35,7 @@ Merge: kullanıcı onayı bekleniyor.
 - Scanner: **yalnız Android/iOS**; desktop unsupported görünüm.
 - Web: kapsam dışında.
 - No QRService/AccountService/singleton/provider/registry/auth/network/navigation.
-- `pretty_qr_code 3.6.0`, `mobile_scanner 7.4.2` planlandı.
+- `pubspec.yaml` içinde `pretty_qr_code: 3.6.0` ve `mobile_scanner: 7.4.2` sabitlendi; `flutter_lints: ^5.0.0` yalnız dev dependency (Dart 3.7 minimumunu korumak için).
 - Scanner one-shot ve `FutureOr<void> Function(String)` callback; payload
   parse/log/serialize edilmez.
 - Minimum Flutter 3.29.0, Dart 3.7.0 (mobile_scanner pubspec gereksinimi);
@@ -51,6 +51,8 @@ Merge: kullanıcı onayı bekleniyor.
 - Kullanıcı `flutter --version` ve `flutter doctor -v` komutlarını yerel Windows makinesinde çalıştırdı; ayrıntılar aşağıdadır.
 - Güncel `flutter doctor -v` (kullanıcı raporu): **No issues found!**; tüm kategoriler [✓], Android lisansları tamam.
 - `flutter pub get`, `flutter analyze`, `flutter test`, native build: **NOT_RUN**.
+- Flutter/Dart/YAML scaffold GitHub üzerinden oluşturuldu: `pubspec.yaml`, `analysis_options.yaml`, `.gitignore`, public library entrypoint, `example/pubspec.yaml`, `example/lib/main.dart`, minimal Example smoke testi.
+- Example `android/`, `ios/`, `windows/`, `linux/`, `macos/` native runner klasörleri henüz **oluşturulmadı**; bunlar Flutter 3.44.9 CLI ile yerelde üretilecek. Dolayısıyla Example henüz gerçek Windows uygulaması olarak çalıştırılamaz.
 - Windows gerçek QR görünümü: **NOT_RUN**.
 - Android fiziksel kamera taraması: **NOT_RUN**.
 - iOS/Linux/macOS: **NOT_RUN**.
@@ -80,11 +82,46 @@ Bu kayıt sadece SDK/toolchain keşfini doğrular. Flutter package dependency
 resolution, plugin native compilation, QR gösterme ve kamera tarama sonucu
 **henüz doğrulanmadı**.
 
+## Aşama 1 uygulama kanıtı ve açık işler (2026-10-14)
+
+- Scaffold commit: `c3085bb5f27e1d2287674a2ceadf134349115d3e`
+  (`feature/initial-qr-widgets`). Public widget kodu **yok**.
+- Paket manuel olarak Flutter'ın temel `pubspec.yaml`/Dart biçiminde
+  oluşturuldu; yerel Flutter executable burada erişilebilir olmadığından
+  CLI üzerinden native runner üretimi yapılmadı.
+- `example/lib/main.dart` derlenebilir olması hedeflenen, henüz yalnız
+  yer tutucu açıklama gösteren basit MaterialApp içerir.
+- `example/test/widget_test.dart` tek smoke testi kaydedildi fakat
+  **çalıştırılmadı**; otomatik üretilen eski counter testinden kaçınıldı.
+- Dev lints için `flutter_lints: ^5.0.0` seçildi. v6.0.0, Dart 3.8+
+  gerektirdiğinden minimum SDK 3.7 kontratıyla uyumsuzdu.
+
+### Kullanıcının yerel ortamında tamamlanacak
+
+```powershell
+cd D:\development\cross-platform\remvibe_ui_qrcode
+git pull --ff-only origin feature/initial-qr-widgets
+flutter pub get
+flutter create --platforms=android,ios,windows,linux,macos --project-name=remvibe_ui_qrcode_example example
+cd example
+flutter pub get
+flutter analyze
+flutter test
+flutter run -d windows
+```
+
+Komutlarda `--overwrite` kullanılmaz; mevcut Example Dart kaynakları
+korunmalı. Çalıştırma sonucu, oluşturulan native dosyalar ve gerçek diff
+gözden geçirildikten sonra commit edilecek. Flutter create varsayılan
+generated örnek veya dosya eklerse gereksizleri commit'e almadan önce
+incelenecek. `flutter run` başarısı yalnız **Example shell** kanıtıdır,
+QR widget doğrulaması değildir.
+
 ## Sonraki hedef
 
-1. Aşama 0 GitHub diff ve kullanıcı yerel working tree sonucu kontrol edildi.
-2. Kullanıcı **Aşama 1'e geçişi açıkça onaylarsa** `flutter create --template=package`
-   temeli, `pubspec.yaml`, platforma uygun `.gitignore` ve Example
-   hazırlığını uygula.
-3. Android lisans engeli kullanıcı tarafından giderildi ve `flutter doctor -v` temiz sonuçlandı; Android gerçek kamera testi için ileride fiziksel cihaz bağla.
-4. Her gerçek platform denemesini bu dosyaya açık sonuçla kaydet.
+1. Yukarıdaki Flutter CLI komutlarının yerel çıktısını ve `git status`/
+   `git diff` durumunu incele, native runner dosyalarını aynı branch'te kaydet.
+2. Root `flutter analyze` ve Example için `flutter analyze`, `flutter test`,
+   `flutter run -d windows` sonuçlarını belgeleyip Aşama 1'i kapat.
+3. Sonraki ayrı onayla Aşama 2 `RemVibeUIQRCode` implementasyonuna başla;
+   ilk gerçek Windows QR görüntüleme sonucu continuity'de saklanacak.

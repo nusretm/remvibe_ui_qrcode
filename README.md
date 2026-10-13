@@ -1,9 +1,10 @@
 # RemVibe UI QR
 
-**Durum: hazırlanıyor — widget'lar henüz uygulanmadı.** Bu branch şu anda
-projenin çalışma kurallarını, mimarisini ve kullanım sözleşmesini tanımlar.
-Aşağıdaki kodlar **hedef public API örnekleridir**; Aşama 1–3 tamamlanmadan
-kopyalanıp çalıştırılabilir oldukları iddia edilmez.
+**Durum: Aşama 1 Flutter iskeleti eklendi; QR widget'lar henüz uygulanmadı.**
+Bu branch proje kurallarını, pubspec bağımlılıklarını, mimariyi ve bir Example
+uygulaması Dart iskeletini içerir. Native Example runner klasörleri yerel
+Flutter CLI ile henüz üretilmedi. Aşağıdaki QR widget kodları **hedef API
+örnekleridir**; Aşama 2–3 tamamlanmadan çalışacakları iddia edilmez.
 
 İki bağımsız Flutter widget'ı:
 
@@ -57,8 +58,9 @@ Sonra:
 flutter pub get
 ```
 
-Paketin kendi `pubspec.yaml` bağımlılıkları Aşama 1'de oluşturulacak:
-`pretty_qr_code: ^3.6.0` ve `mobile_scanner: ^7.4.2`.
+Paketin `pubspec.yaml` bağımlılıkları Aşama 1'de oluşturuldu:
+`pretty_qr_code: 3.6.0` ve `mobile_scanner: 7.4.2` (ilk sürüm için sabit).
+Paket henüz `publish_to: none` olarak işaretli, yayımlanmıyor.
 Yayımlama tamamlanmadan `pub.dev` üzerinden
 `remvibe_ui_qrcode: ^...` kullanımı vaat edilmez.
 
@@ -213,9 +215,27 @@ desteği olması bu package için Web test/destek taahhüdü değildir.
 
 ## Example uygulaması ve doğrulama
 
-Aşama 1–3 kapsamında `example/` Flutter uygulaması eklenecek:
-metin alanından QR gösterme, scanner kamera alanı, okunan metin,
-izin reddi ve unsupported UI. Hedef komutlar (Example henüz yok):
+Aşama 1'de `example/lib/main.dart` temel uygulama kabuğu oluşturuldu.
+Şimdilik QR üretme/tarama değil, geliştirme durumunu gösterir.
+Aşama 2–3'te metin alanından QR gösterme, scanner kamera alanı,
+okunan metin, izin reddi ve unsupported UI eklenecek.
+
+İlk çalıştırma için **Flutter 3.44.9 kurulu geliştirme makinesinde** proje
+kökünden native runner oluşturulmalıdır. Komut mevcut Dart/YAML dosyalarını
+koruyacak şekilde (`--overwrite` olmadan) çalıştırılır:
+
+```powershell
+flutter create --platforms=android,ios,windows,linux,macos --project-name=remvibe_ui_qrcode_example example
+flutter pub get
+cd example
+flutter pub get
+flutter analyze
+flutter test
+flutter run -d windows
+```
+
+Native runner dosyaları branch'te kaydedilene kadar Example'ın Windows'ta
+çalıştığı iddia edilmez. Sonraki çalışmalar için hedef komutlar:
 
 ```sh
 cd example
@@ -224,6 +244,7 @@ flutter run -d windows
 flutter run -d android
 ```
 
+Aşama 1'deki analyzer/test/run komutları henüz çalıştırılmadı.
 Sonraki checkpoint'lerde `flutter test`, `flutter analyze`,
 `dart analyze` ve gerçek cihaz kontrollerinin sonuçları ayrı ayrı
 `docs/continuity/CURRENT_TARGET.md` dosyasına yazılacaktır.

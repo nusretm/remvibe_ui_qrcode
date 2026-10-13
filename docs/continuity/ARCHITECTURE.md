@@ -1,6 +1,6 @@
 # Architecture — RemVibe UI QR
 
-Durum: **DESIGNED**, widget kodu henüz uygulanmadı (2026-10-13).
+Durum: QR widget API **DESIGNED**; package ve Example Dart iskeleti **IMPLEMENTED**, widget kodu henüz uygulanmadı (2026-10-14).
 
 ## Sorumluluklar
 
@@ -9,7 +9,7 @@ remvibe_ui_qrcode/
   lib/remvibe_ui_qrcode.dart          # tek public export entrypoint
   lib/src/qr_code/                    # RemVibeUIQRCode
   lib/src/qr_scanner/                 # RemVibeUIQRScanner
-  example/                            # QR üretme/okuma demo uygulaması
+  example/                            # MaterialApp shell (QR demo eklenecek)
   test/                               # az sayıda odaklı widget testi
   docs/                               # proje kuralları ve continuity
 ```
@@ -111,3 +111,10 @@ app resumed ve hâlâ bekleniyorsa -> güvenli şekilde devam et
   okunan metin widget dışındaki uygulama alanında gösterilir.
 - İzin reddi ve desteklenmeyen platform durumları görünürdür.
 - Test/analyze sonuçları ile live evidence ayrı kaydedilir.
+
+## Aşama 1 fiziksel durum
+
+- Root `pubspec.yaml`, `analysis_options.yaml`, `.gitignore` ve public library dosyası mevcut.
+- `example/pubspec.yaml`, `example/lib/main.dart`, küçük Example smoke testi mevcut.
+- Android/iOS/Windows/Linux/macOS Example runner'ları Flutter CLI ile yerelde üretilecek; henüz commit edilmedi.
+- Public widget implementasyonu, kamera controller ve platform native izin değişiklikleri henüz yok.
