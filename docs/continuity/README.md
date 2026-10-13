@@ -19,4 +19,4 @@ Durumlar: `DESIGNED` (karar alındı), `IMPLEMENTED` (kod var),
 kanıtı var), `BLOCKED`, `DEFERRED`. Bu terimler birbirinin yerine kullanılmaz.
 Belgeye commit/branch, platform, kullanılan komut, gerçek sonuç ve açık risk ekle.
 
-Son güncelleme: 2026-10-13.
+Son güncelleme: 2026-10-14.

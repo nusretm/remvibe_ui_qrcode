@@ -203,3 +203,17 @@ ve optik QR okutma ayrıca doğrulanmadı.
   permission-denied, app lifecycle ve iOS çalışma kanıtı yok.
 - Yerel Flutter build tarafından modifiye edilen Gradle `minSdk` satırının
   son working-tree durumu ayrıca kontrol edilmeli.
+
+## Example Android minSdk final kararı (2026-10-14)
+
+- Kullanıcı onayıyla `example/android/app/build.gradle.kts` içinde
+  `minSdk = flutter.minSdkVersion` benimsendi, commit `4811641`.
+- Flutter 3.44.9 `flutter.minSdkVersion` = API 24;
+  `mobile_scanner 7.4.2` minimum API 23. Bu, Example host
+  ayarıdır; package tüketici uygulamalarının native SDK ayarlarını
+  otomatik değiştirmez.
+- Samsung Android 13 canlı tarama, QR paint regresyonu ve Windows QR
+  görüntüleme önceki checkpoint kanıtlarıyla doğrulandı.
+- Tekrar event, permission-denied, background/resume, iOS gerçek cihaz
+  ve Linux/macOS GUI kontrolleri henüz ayrıca doğrulanmadı.
+- PR/merge onayı bekleniyor; yayınlama hedefi değil.

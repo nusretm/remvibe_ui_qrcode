@@ -3,7 +3,7 @@
 Tarih: 2026-10-14
 Repository: https://github.com/nusretm/remvibe_ui_qrcode
 Package adı: `remvibe_ui_qrcode`
-Onaylanan kapsam: **Aşama 3**, Android/iOS QR scanner widget'ı, Example, native kamera ayarları ve dokümantasyon.
+Onaylanan kapsam: **Aşama 3 tamamlayıcı Android minSdk uyumu ve son repository incelemesi**. PR/merge için ayrı onay bekleniyor.
 Aktif branch: `feature/initial-qr-widgets`.
 Merge: kullanıcı onayı bekleniyor.
 
@@ -26,7 +26,7 @@ Merge: kullanıcı onayı bekleniyor.
 | 2: QR görüntüleme ve Example alanı | IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED | root analyze PASS; root tests +2; Example analyze PASS; Example tests +1; Windows QR kullanıcı tarafından ekranda görüldü; Windows uygulaması kullanıcı tarafından kapatıldı (EXPECTED_EXIT) |
 | 3: QR scanner ve Example alanı | IMPLEMENTED + TESTED + ANDROID_QR_LIVE_VERIFIED; QR_PAINT_GUARD_RETEST_PASS | root analyze PASS / tests +4; Example analyze PASS / tests +1; Android APK build/install/camera PASS; önceki canlı okuma kanıtı geçerli; yeni Android logunda PrettyQr paint assertion tekrarlanmadı |
 | 4: diğer hedef platformlar ve odaklı testler | NOT_STARTED | platforma göre ayrı kayıt |
-| 5: README final, diff review, PR ve kullanıcı onayı | NOT_STARTED | gözden geçirilmiş PR; merge ayrı onaylı |
+| 5: README final, diff review, PR ve kullanıcı onayı | DOCS_UPDATED / DIFF_REVIEWED; PR_NOT_OPEN / MERGE_NOT_APPROVED | SDK kararı `4811641`, son doc commit; kalan opsiyonel cihaz/lifecycle kontrolleri kayıtlı |
 
 ## Sınırlar ve kararlar
 
@@ -369,14 +369,66 @@ geçirilmeli. Native minSdk tutarlılığı sonraki incelemede çözülmeli.
 QR paint guard retest başarılı. Ek lifecycle senaryoları,
 iOS ve yerel Gradle diff'i release review için açık.
 
+## Aşama 3 — Android minSdk kararı ve son diff review (2026-10-14)
+
+Kullanıcı `git status --short` ile yalnız
+`example/android/app/build.gradle.kts` değişikliğini doğruladı.
+`git diff` yalnız şu satırı gösterdi:
+
+```diff
+- minSdk = 23
++ minSdk = flutter.minSdkVersion
+```
+
+Kullanıcı "yapalım" diyerek bu uyum değişikliğini ve documentation
+incelemesini onayladı. GitHub'a bakıldığında **değişiklik zaten
+commit edilmiş** bulundu:
+
+- `4811641ab36b4aae7a11e36d543b787466104b81`
+- Mesaj: `build: use Flutter default Android minSdk`
+- Parent: `30860042e642784fc01f783707b5349b06e6159c`
+- `3086004..4811641` diff: **yalnız**
+  `example/android/app/build.gradle.kts`; bir satır değiştirildi.
+- Flutter **3.44.9** `FlutterExtension.kt`: varsayılan
+  `minSdkVersion = 24`; `mobile_scanner 7.4.2`
+  için minimum API **23** gereksinimi karşılanır.
+- Önceki fiziksel Samsung SM A515F / Android 13 build ve QR scan
+  **LIVE_VERIFIED** durumu korunur. `4811641` commit'inden
+  sonra ayrıca bir `flutter run` kanıtı gelmedi; otomatik
+  `PASS` yazılmaz.
+- Bu commit GitHub branch'inde bulunduğundan aynı satır için
+  ikinci kaynak değişikliği yapılmadı; local working tree'nin
+  temiz olduğu yeni `git status` ile ayrıca doğrulanmalı.
+
+### Son repository incelemesi
+
+`main..feature/initial-qr-widgets` GitHub diff'i incelendi.
+Kaynakta iki public widget ve Example platform runner'ları mevcut;
+bağımlılıklar yalnız `pretty_qr_code 3.6.0` ve
+`mobile_scanner 7.4.2`. QR payload parsing/auth/service eklenmedi.
+Daha önceki kullanıcı kanıtları root analyze +4 tests, Example
+analyze +1 test, Windows QR display ve Samsung Android QR optik
+okuması için PASS/LIVE_VERIFIED.
+
+Açık doğrulama/işletim riskleri: scanner'ın tekrar eden eventlerde
+one-shot callback sayısı gerçek cihazda ölçülmedi; permission denied,
+background/resume, yeniden kamera açma ve iOS gerçek cihaz testi
+ayrıca yapılmadı. Linux/macOS ekran gösterimi test edilmedi.
+Bu konular **UNVERIFIED**, başarısız olarak raporlanmış değiller.
+`pubspec.yaml` hâlâ `publish_to: none` ve
+`0.1.0-dev.1`; yayınlama bu checkpoint kapsamında değildir.
+
+Bu inceleme **PR açma veya merge yetkisi değildir**.
+
 ## Sonraki hedef
 
-1. Kullanıcı `git status --short` ve
-   `git diff -- example/android/app/build.gradle.kts` ile
-   Flutter'ın yerel Android minSdk güncellemesini gözden geçirsin.
-   Native `minSdk` minimumunun 23 olarak kaldığı doğrulansın.
-2. Aşama 3 temel kabulü doğrulandı. İsteğe bağlı Android one-shot
-   tekrar okuma/yeniden açma, izin reddi ve background/resume
-   koşulları ayrı manuel kanıt olarak kaydedilebilir.
-3. Bir sonraki checkpoint/PR/merge kullanıcıdan **ayrı açık onay**
-   bekler; iOS/Linux/macOS için doğrulanmamış test sonucu yazılmaz.
+1. Yerelde `git pull --ff-only origin feature/initial-qr-widgets`
+   ve `git status` ile `4811641` ve yeni continuity commit'i
+   senkronize/temiz olduğunu doğrula.
+2. İstenirse Android'de bir kez daha `flutter run` ile
+   varsayılan minSdk yapılandırmasının bu commit'te de
+   çalıştığını göster; önceki build/scan kanıtları aynen korunur.
+3. Scanner lifecycle/permission ve iOS/Linux/macOS platform
+   kontrolleri ayrı opsiyonel doğrulamalardır; yapılmadan PASS
+   sayılmayacak.
+4. PR/merge için **kullanıcıdan ayrı açık onay** al.

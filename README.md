@@ -173,7 +173,8 @@ Aşağıdaki native ayarlar **QR scanner kullanılacak Android/iOS uygulamaları
 içindir. Package widget'ının kendi içinde yönetemeyeceği izin açıklaması ve
 native build gereksinimleri host uygulamanın sorumluluğundadır.
 Bilgiler `mobile_scanner 7.4.2` kaynaklarından derlendi;
-**Android/iOS Example native build ve kamera testi henüz doğrulanmadı**.
+**Android Example APK build ve Samsung SM A515F / Android 13 kamera okuması
+doğrulandı. iOS build ve gerçek iOS kamera testi henüz yapılmadı.**
 
 ### Android
 
@@ -190,8 +191,11 @@ Bilgiler `mobile_scanner 7.4.2` kaynaklarından derlendi;
 3. Gerçek cihaz kamera iznini Android çalışma zamanında ister;
    kullanıcı reddederse scanner kontrollü durum gösterir.
 4. Repository'nin Example uygulamasında `example/android/app/build.gradle.kts`
-   için `minSdk = 23` ayarlanmıştır. Host uygulamanız için aynı minimum
-   sürüm kuralını uygulayın. Android cihazda gerçek build/run henüz yapılmadı.
+   için `minSdk = flutter.minSdkVersion` kullanılır. Flutter **3.44.9**
+   sürümündeki bu varsayılan **API 24**'tür; plugin'in gerektirdiği
+   minimum **API 23**'ü karşılar. Android build ve fiziksel kamera
+   taraması doğrulandı. Host projede kullanılan Flutter sürümünün
+   gerçek `minSdk` değerini ayrıca kontrol edin.
 
 Örnek `android/app/build.gradle.kts` parçası (var olan Android
 yapılandırmanızı tümüyle değiştirmeyin):
@@ -199,10 +203,14 @@ yapılandırmanızı tümüyle değiştirmeyin):
 ```kotlin
 android {
     defaultConfig {
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
     }
 }
 ```
+
+Bu örnek Flutter'ın varsayılan SDK'sını kullanır; belirli bir alt
+Android API sürümünü desteklemek istiyorsanız host uygulamanın
+kullandığı Flutter SDK ile plugin minimumunu birlikte değerlendirin.
 
 Varsayılan ML Kit modeli bundled kullanılır ve ilk taramada indirme
 gerektirmez. İsteğe bağlı unbundled mod için (ilk kullanımda Google Play
@@ -368,6 +376,23 @@ Example analyzer PASS ve Example test +1 PASS sonuçlarıyla doğrulandı.
 Samsung SM A515F üzerinde APK tekrar çalıştırıldı; kamera açıldı ve önceki
 QR paint assertion'ı tekrar görülmedi. Bu son oturumda ayrıca QR okuma
 sonucu bildirilmedi; daha önce `RemVibe UI QR` başarıyla okutuldu.
+
+### Android Gradle minSdk kararı (2026-10-14)
+
+Flutter 3.44.9'un Gradle `FlutterExtension` tanımında
+`flutter.minSdkVersion = 24` olarak belirlenmiştir.
+`mobile_scanner 7.4.2` minimum Android API 23 gerektirir.
+
+Flutter'ın yerel Example `build.gradle.kts` dosyasında otomatik
+yaptığı `minSdk = 23` → `minSdk = flutter.minSdkVersion`
+değişikliği onaylandı ve `4811641` commit'inde feature branch'e
+eklendi. Bu nedenle bu satır için yerel/remote Git farkı tekrar
+oluşturulmaması hedeflenir. Değişiklik **Example Android host**
+uygulamasına aittir, paket tüketen uygulamaların minimum SDK
+kontratını kendiliğinden değiştirmez.
+
+Son Android derleme ve analiz sonuçları önceki kullanıcı oturumlarında
+PASS; **bu commit sonrasında ayrıca yeni bir native run kaydı yoktur**.
 
 ## Development ve belgeler
 

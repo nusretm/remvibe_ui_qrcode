@@ -5,6 +5,14 @@
 ### Planned
 - Android scanner lifecycle/one-shot edge-case checks and optional iOS device validation.
 
+### Android Example minSdk alignment and repository review — 2026-10-14
+- Accept Flutter-generated `minSdk = flutter.minSdkVersion` in Example Android
+  host project (commit `4811641`); Flutter 3.44.9 defaults to API 24.
+- Confirm Android scanner dependency requires at least API 23.
+- Review feature branch diff and synchronize README/continuity with
+  validated devices, outstanding lifecycle tests, and pre-merge status.
+- PR/merge not performed; no separate post-minSdk native build reported.
+
 ### Android live scanner + initial QR layout guard — 2026-10-14
 - Root widget tests +3 PASS, Android Example debug APK build/install PASS.
 - Physical Samsung SM A515F (Android 13) scanned the Windows Example QR:
