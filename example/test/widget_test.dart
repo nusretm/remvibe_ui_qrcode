@@ -9,6 +9,7 @@ void main() {
 
     expect(find.byType(RemVibeUIQRCode), findsOneWidget);
     expect(find.text('QR preview'), findsOneWidget);
+    expect(find.text('Open scanner'), findsOneWidget);
 
     await tester.enterText(find.byKey(const Key('qr_data_input')), '');
     await tester.pump();

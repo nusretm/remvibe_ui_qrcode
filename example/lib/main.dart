@@ -5,7 +5,7 @@ void main() {
   runApp(const RemVibeUIQRCodeExampleApp());
 }
 
-/// A small interactive example for the approved QR-display widget.
+/// Editable QR preview and a separate on-demand camera scanner.
 class RemVibeUIQRCodeExampleApp extends StatelessWidget {
   const RemVibeUIQRCodeExampleApp({super.key});
 
@@ -27,6 +27,8 @@ class _QRCodeDemoPage extends StatefulWidget {
 
 class _QRCodeDemoPageState extends State<_QRCodeDemoPage> {
   final TextEditingController _textController = TextEditingController(text: 'RemVibe UI QR');
+  bool _scannerVisible = false;
+  String? _lastRead;
 
   @override
   void dispose() {
@@ -68,6 +70,33 @@ class _QRCodeDemoPageState extends State<_QRCodeDemoPage> {
                         size: 250,
                       ),
                     ),
+                    const SizedBox(height: 24),
+                    if (!_scannerVisible)
+                      FilledButton(
+                        onPressed: () => setState(() => _scannerVisible = true),
+                        child: const Text('Open scanner'),
+                      )
+                    else ...[
+                      SizedBox(
+                        height: 300,
+                        child: RemVibeUIQRScanner(
+                          onRead: (data) {
+                            if (!mounted) return;
+                            setState(() {
+                              _lastRead = data;
+                              _scannerVisible = false;
+                            });
+                          },
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => setState(() => _scannerVisible = false),
+                        child: const Text('Close scanner'),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    const Text('Last scanned QR'),
+                    SelectableText(_lastRead ?? 'No QR read yet.'),
                   ],
                 ),
               ),
