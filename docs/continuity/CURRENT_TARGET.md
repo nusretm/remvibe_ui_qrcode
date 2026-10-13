@@ -81,7 +81,7 @@ ChatGPT ortamında yerel Flutter komutu çalıştırıldığı iddia edilmez.
   Dart ^3.7.0 koşullarını sürüm bakımından karşılıyor.
 - Çıktıda Web cihazları görünmesi Web'i kapsama eklemez.
 
-İlk ortam kaydından sonra Flutter package dependency resolution, Example Windows shell build ve başlangıç çalıştırması doğrulandı; QR gösterme ve Android/iOS kamera tarama **henüz uygulanmadı/doğrulanmadı**.
+İlk ortam kaydından sonra Flutter package dependency resolution, Example Windows shell build ve başlangıç çalıştırması doğrulandı. Sonraki Aşama 2'de QR gösterme Windows'ta LIVE_VERIFIED; Aşama 3'te Android/iOS scanner IMPLEMENTED ancak henüz TESTED/LIVE_VERIFIED değildir.
 
 ## Aşama 1 uygulama kanıtı ve açık işler (2026-10-14)
 
