@@ -1,7 +1,8 @@
 # RemVibe UI QR
 
-**Durum: QR gösterme widget'ı uygulandı; gerçek Windows QR görüntüleme
-doğrulaması bekleniyor.** Android/iOS scanner henüz uygulanmadı.
+**Durum: QR gösterme widget'ı Windows'ta gerçek ekranda görüntülendi;**
+kod, root/Example analyze ve odaklı testler başarılı. Android/iOS scanner
+henüz uygulanmadı.
 Example uygulaması metin girip canlı QR önizlemesi gösterir ve
 Android/iOS/Windows/Linux/macOS native runner dosyalarını içerir.
 
@@ -99,10 +100,11 @@ QR görüntüleme kamera izni veya uzak sunucu gerektirmez.
 Alan değiştikçe `RemVibeUIQRCode` yeni içeriği gösterir. Scanner'a ait
 Example bölümü Aşama 3'te eklenecek.
 
-> Aşama 2 kodu GitHub'a işlendi ancak yeni `flutter analyze`,
-> `flutter test` ve Windows üzerinde gerçek QR görüntüleme henüz
-> çalıştırılmadı. Windows Example'ın önceki debug bağlantı kesilmesi
-> ayrıca açık doğrulama konusudur.
+> Aşama 2 için root `flutter analyze` ve `flutter test` (+2), Example
+> `flutter analyze` ve `flutter test` (+1) başarılı. Windows üzerinde QR
+> gerçekten görüldü; debug oturumunda tekrar `Lost connection to device`
+> oluştu, sebebi henüz doğrulanmadı. Manuel QR metin değişikliği ve
+> başka bir cihazla optik okuma ayrıca doğrulanmadı.
 
 ## QR okuma — planlanan API (Android / iOS)
 
@@ -252,10 +254,11 @@ Aşama 1'in kullanıcı tarafından raporlanan doğrulamaları:
 başarılı. Windows debug oturumu daha sonra `Lost connection to device`
 ile sonlandı; kesintisiz çalışma **henüz doğrulanmadı**.
 
-Bu sonuçlar yalnız Aşama 1 Example shell için geçerlidir. Yeni QR widget
-ile `flutter analyze`, `flutter test` (root ve Example) ve
-`flutter run -d windows` **yeniden çalıştırılmalıdır**. Scanner için
-Android/iOS gerçek cihaz doğrulaması Aşama 3'te yapılacaktır.
+Aşama 2 değişiklikleri sonrasında root/Example analyzer ve testler yeniden
+çalıştırıldı ve başarılı oldu (root +2, Example +1). Windows üzerinde
+QR kod ekranda görüntülendi. Debug bağlantısının sonradan kesilme nedeni
+**UNRESOLVED**; bu sonucu QR görüntüleme başarısıyla karıştırmıyoruz.
+Scanner için Android/iOS gerçek cihaz doğrulaması Aşama 3'te yapılacaktır.
 
 ## Development ve belgeler
 

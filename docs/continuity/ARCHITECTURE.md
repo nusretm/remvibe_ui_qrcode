@@ -1,6 +1,6 @@
 # Architecture — RemVibe UI QR
 
-Durum: QR display **IMPLEMENTED / NOT_TESTED** (Aşama 2); scanner **DESIGNED / NOT_STARTED** (2026-10-14).
+Durum: QR display **IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED** (Aşama 2); scanner **DESIGNED / NOT_STARTED** (2026-10-14).
 
 ## Sorumluluklar
 
@@ -136,3 +136,12 @@ app resumed ve hâlâ bekleniyorsa -> güvenli şekilde devam et
   disconnect kaydı çözülmedi.
 - Scanner, kamera izinleri veya native platform dosyaları bu checkpoint'te
   değiştirilmedi.
+
+## Aşama 2 doğrulama sonuçları (2026-10-14)
+
+Kullanıcı root analyzer PASS, root tests (+2) PASS, Example analyzer PASS
+ve Example tests (+1) PASS bildirdi. Windows Example native build çalıştı,
+QR kod gerçek ekranda görüldü: **WINDOWS_QR_LIVE_VERIFIED**.
+Daha sonra debug bağlantısı `Lost connection to device` ile kesildi;
+sebebi **UNRESOLVED**. Manuel metin güncellemesi ve optik QR okutma
+ayrıca doğrulanmadı. Scanner halen uygulanmadı.

@@ -23,7 +23,7 @@ Merge: kullanıcı onayı bekleniyor.
 | --- | --- | --- |
 | 0: AGENTS, çalışma kuralları, continuity, README başlangıcı | IMPLEMENTED (doc only; GitHub diff ve yerel temiz working tree kontrol edildi) | Commit `0e6aa97`; kullanıcı `git status` temiz olduğunu bildirdi |
 | 1: Flutter package temel dosyaları, pubspec ve bağımlılıklar | IMPLEMENTED + TESTED (Example shell), NATIVE_RUNNERS_COMMITTED; RUN_DISCONNECT_UNRESOLVED | `flutter pub get`, Example analyze/test, root analyze PASS; Windows build/VM Service başlangıcı PASS, sonra bağlantı kesildi |
-| 2: QR görüntüleme ve Example alanı | IMPLEMENTED / NOT_TESTED / NOT_LIVE_VERIFIED | QR sınıfı + Example metin alanı + iki odaklı test; Windows gerçek QR görünümü bekleniyor |
+| 2: QR görüntüleme ve Example alanı | IMPLEMENTED + TESTED + WINDOWS_QR_LIVE_VERIFIED | root analyze PASS; root tests +2; Example analyze PASS; Example tests +1; Windows QR kullanıcı tarafından ekranda görüldü; Windows debug bağlantı kesilmesi UNRESOLVED |
 | 3: QR scanner ve Example alanı | NOT_STARTED | Android gerçek kamera okumayı doğrulama |
 | 4: diğer hedef platformlar ve odaklı testler | NOT_STARTED | platforma göre ayrı kayıt |
 | 5: README final, diff review, PR ve kullanıcı onayı | NOT_STARTED | gözden geçirilmiş PR; merge ayrı onaylı |
@@ -56,7 +56,7 @@ Merge: kullanıcı onayı bekleniyor.
 - Windows Example native build: **PASS**; Dart VM Service başladı, ardından `Lost connection to device` görüldü. Kalıcı oturum **UNRESOLVED**.
 - Flutter/Dart/YAML scaffold GitHub üzerinden oluşturuldu: `pubspec.yaml`, `analysis_options.yaml`, `.gitignore`, public library entrypoint, `example/pubspec.yaml`, `example/lib/main.dart`, minimal Example smoke testi.
 - Example `android/`, `ios/`, `windows/`, `linux/`, `macos/` native runner klasörleri **kullanıcının yerel ortamında** `flutter create` ile oluşturuldu (120 dosya raporu); bunlardan commit kapsamına giren 119 yeni dosya GitHub `7882a42` commit'inde **COMMITTED**.
-- Windows gerçek QR görünümü: **NOT_RUN**.
+- Windows gerçek QR görünümü: **LIVE_VERIFIED** (kullanıcı QR kodun ekranda göründüğünü bildirdi; Aşama 2).
 - Android fiziksel kamera taraması: **NOT_RUN**.
 - iOS/Linux/macOS: **NOT_RUN**.
 
@@ -152,20 +152,46 @@ ChatGPT ortamında yerel Flutter komutu çalıştırıldığı iddia edilmez.
   kapasite taşması kontrolü; Example `example/test/widget_test.dart`:
   metin değişimlerini kapsar.
 - Production dependency eklenmedi, `pubspec.yaml` değiştirilmedi.
-- Gerçek `flutter analyze`, `flutter test`, Windows QR run
-  **NOT_RUN** (kullanıcının yerel ortamında beklenecek).
+- İlk implementasyon commit'i oluşturulduğunda yeni `flutter analyze`, `flutter test` ve Windows QR doğrulamaları NOT_RUN durumundaydı. Kullanıcı bunları daha sonra çalıştırdı; aşağıdaki Aşama 2 doğrulama kaydına bak.
 - Önceki Aşama 1 Windows bağlantı kesilmesi hâlâ **UNRESOLVED**;
   yeni QR görüntüleme sonucu bu sorunu ayrıca değerlendirecek.
 
+## Aşama 2 gerçek doğrulama — kullanıcı PowerShell kanıtı (2026-10-14)
+
+Kaynak: Kullanıcının yerel Windows PowerShell komut çıktıları ve
+"QRCode ekranda göründü" gözlemi. Sonuçlar fiziksel makinede kullanıcı
+tarafından doğrulandı; GitHub üzerinde komut çalıştırıldığı iddia edilmez.
+
+- `git pull --ff-only origin feature/initial-qr-widgets`: PASS;
+  `2b4ff5c..fc794c1` fast-forward. Aşama 2 kaynakları yerelde alındı.
+- Root `flutter analyze`: **PASS**, No issues found (3.3s).
+- Root `flutter test`: **PASS**, +2 All tests passed.
+- `example/flutter analyze`: **PASS**, No issues found (1.5s).
+- `example/flutter test`: **PASS**, +1 All tests passed.
+- `example/flutter run -d windows`: **BUILD_VERIFIED**, Windows
+  `remvibe_ui_qrcode_example.exe` üretildi, VM Service başlangıcı görüldü.
+- Kullanıcı gerçek Windows ekranında QR kodun göründüğünü bildirdi:
+  **WINDOWS_QR_LIVE_VERIFIED** (yalnız QR görünümünün çizilmesi).
+- Terminalde tekrar `Lost connection to device` görüldü;
+  nedeni açıklanmadığı için **UNRESOLVED**. Debug bağlantısının kalıcı
+  çalışması veya uygulamanın uzun süre stabil kalması doğrulanmış değildir.
+- Manuel olarak QR `data` güncellemesi, boş içerik, kapasite taşması
+  veya başka cihazla optik okuma sonucu ayrıca bildirilmedi;
+  yalnız bunlara ilişkin odaklı widget testlerinin başarılı olduğu biliniyor.
+- Android/iOS scanner: **NOT_IMPLEMENTED / NOT_RUN**.
+- Linux/macOS QR görüntüleme: **NOT_RUN**.
+- Bu kanıtlarla Aşama 2 QR gösterme checkpoint'i `IMPLEMENTED +
+  TESTED + WINDOWS_QR_LIVE_VERIFIED` olarak kapandı.
+- Aşama 3 scanner için ayrıca açık kullanıcı onayı gerekir.
+
 ## Sonraki hedef
 
-1. Kullanıcı branch'i pull edip root `flutter analyze`, `flutter test`,
-   Example `flutter analyze` ve `flutter test` çalıştırsın.
-2. Windows `flutter run -d windows` ile canlı QR render, metin değişimi,
-   boş metin ve kapasite taşması incelensin. Önceki Windows disconnect
-   ayrı açık sonuca bağlansın.
-3. Sonuçları bu continuity belgesine geçir; Aşama 2'yi ancak kanıt
-   sonrası `TESTED` / `LIVE_VERIFIED` ilan et.
-4. Aşama 3 Android/iOS scanner için ayrı kullanıcı onayı beklenecek;
-   iOS `NSCameraUsageDescription` ve Android native build gereksinimleri
-   o aşamada ele alınacak.
+1. Kullanıcı cihaz üzerinde `Lost connection to device` nedenini
+   (pencere kapanışı mı / beklenmeyen kopma mı) bildirirse ayrı doğrulama
+   kaydı aç; mevcut QR live evidence geriye dönük geçersiz sayılmaz.
+2. Ayrı açık onay sonrasında Aşama 3: Android/iOS
+   `RemVibeUIQRScanner`, kamera lifecycle, one-shot callback, kamera
+   izni/error UI ve Example ile gerçek Android doğrulaması.
+3. Scanner öncesinde iOS `NSCameraUsageDescription` ve Android
+   SDK gereksinimleri native host uygulamada tamamlanacak.
+4. PR/merge için ayrıca kullanıcı onayı gerekir.

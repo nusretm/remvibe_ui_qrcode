@@ -4,7 +4,7 @@
 
 ### Planned
 - `RemVibeUIQRScanner` Android/iOS one-shot scanner backed by `mobile_scanner`.
-- Runnable Example app and real Windows / Android validation.
+- Android scanner Example and real Android camera validation.
 
 ### QR display (Aşama 2) — 2026-10-14
 - Add `RemVibeUIQRCode(data: ..., size: 250)` using `pretty_qr_code 3.6.0`.
@@ -12,7 +12,9 @@
 - Show safe fallback for empty, unencodable, or over-capacity contents.
 - Replace Example placeholder with editable text and QR preview.
 - Add focused root QR and Example interaction tests (not yet executed).
-- Windows QR display live validation and new analyze/test runs are pending.
+- Validate QR display in a real Windows Example run (user confirmed QR visible).
+- Root `flutter analyze` PASS, `flutter test` +2 PASS; Example `flutter analyze` PASS, `flutter test` +1 PASS.
+- Windows debug session later reported `Lost connection to device`; cause still unresolved.
 
 ### Package/Example scaffold — 2026-10-14
 - Add Flutter package `pubspec.yaml`, public library entrypoint and lints.
@@ -28,4 +30,4 @@
 - Record architecture, current target, platform contract, and verification status.
 - Draft README integration and native platform setup guide.
 
-> The QR-display source is implemented but not yet analyzed/tested or live-verified. Scanner is not implemented. The earlier Windows Example shell run disconnect remains unresolved.
+> QR display is implemented, analyzed, tested, and visually verified on Windows. Scanner is not implemented. Debug connection loss remains unresolved; Android/iOS, Linux/macOS and QR optical-reading validation are pending.
