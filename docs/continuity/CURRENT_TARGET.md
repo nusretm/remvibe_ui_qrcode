@@ -22,7 +22,7 @@ Merge: kullanıcı onayı bekleniyor.
 | Adım | Durum | Kabul kanıtı |
 | --- | --- | --- |
 | 0: AGENTS, çalışma kuralları, continuity, README başlangıcı | IMPLEMENTED (doc only; GitHub diff ve yerel temiz working tree kontrol edildi) | Commit `0e6aa97`; kullanıcı `git status` temiz olduğunu bildirdi |
-| 1: Flutter package temel dosyaları, pubspec ve bağımlılıklar | IMPLEMENTED (Dart/YAML scaffold); NATIVE_RUNNERS_PENDING / NOT_TESTED | Commit `c3085bb`; yerel `flutter create` + `pub get` ve analyzer sonuçları henüz bekleniyor |
+| 1: Flutter package temel dosyaları, pubspec ve bağımlılıklar | IMPLEMENTED + TESTED (yerel Example shell); NATIVE_RUNNERS_UNTRACKED / RUN_DISCONNECT_UNRESOLVED | `flutter pub get`, Example analyze/test, root analyze PASS; Windows build/VM Service başlangıcı PASS, sonra bağlantı kesildi |
 | 2: QR görüntüleme ve Example alanı | NOT_STARTED | Windows QR gösterimi |
 | 3: QR scanner ve Example alanı | NOT_STARTED | Android gerçek kamera okumayı doğrulama |
 | 4: diğer hedef platformlar ve odaklı testler | NOT_STARTED | platforma göre ayrı kayıt |
@@ -39,7 +39,7 @@ Merge: kullanıcı onayı bekleniyor.
 - Scanner one-shot ve `FutureOr<void> Function(String)` callback; payload
   parse/log/serialize edilmez.
 - Minimum Flutter 3.29.0, Dart 3.7.0 (mobile_scanner pubspec gereksinimi);
-  kullanıcının yerel SDK sürümleri minimumları karşılıyor; pub get/native derleme henüz çalıştırılmadı.
+  kullanıcının yerel SDK sürümleri minimumları karşılıyor; `flutter pub get` ve Windows Example shell native build başarılı.
 
 ## Gerçek doğrulama
 
@@ -50,9 +50,12 @@ Merge: kullanıcı onayı bekleniyor.
 - `pretty_qr_code` 3.6.0 platform/kapsam pub.dev üzerinden gözden geçirildi.
 - Kullanıcı `flutter --version` ve `flutter doctor -v` komutlarını yerel Windows makinesinde çalıştırdı; ayrıntılar aşağıdadır.
 - Güncel `flutter doctor -v` (kullanıcı raporu): **No issues found!**; tüm kategoriler [✓], Android lisansları tamam.
-- `flutter pub get`, `flutter analyze`, `flutter test`, native build: **NOT_RUN**.
+- `flutter pub get` (root + Example): **PASS**; `pretty_qr_code 3.6.0` ve `mobile_scanner 7.4.2` kuruldu.
+- Example `flutter analyze`: **PASS**; Example `flutter test`: **PASS** (+1).
+- Root `flutter analyze`: **PASS**.
+- Windows Example native build: **PASS**; Dart VM Service başladı, ardından `Lost connection to device` görüldü. Kalıcı oturum **UNRESOLVED**.
 - Flutter/Dart/YAML scaffold GitHub üzerinden oluşturuldu: `pubspec.yaml`, `analysis_options.yaml`, `.gitignore`, public library entrypoint, `example/pubspec.yaml`, `example/lib/main.dart`, minimal Example smoke testi.
-- Example `android/`, `ios/`, `windows/`, `linux/`, `macos/` native runner klasörleri henüz **oluşturulmadı**; bunlar Flutter 3.44.9 CLI ile yerelde üretilecek. Dolayısıyla Example henüz gerçek Windows uygulaması olarak çalıştırılamaz.
+- Example `android/`, `ios/`, `windows/`, `linux/`, `macos/` native runner klasörleri **kullanıcının yerel ortamında** `flutter create` ile oluşturuldu (120 dosya); `git status` üzerinde untracked. Bu dosyalar henüz GitHub'a commit edilmedi.
 - Windows gerçek QR görünümü: **NOT_RUN**.
 - Android fiziksel kamera taraması: **NOT_RUN**.
 - iOS/Linux/macOS: **NOT_RUN**.
@@ -78,9 +81,7 @@ ChatGPT ortamında yerel Flutter komutu çalıştırıldığı iddia edilmez.
   Dart ^3.7.0 koşullarını sürüm bakımından karşılıyor.
 - Çıktıda Web cihazları görünmesi Web'i kapsama eklemez.
 
-Bu kayıt sadece SDK/toolchain keşfini doğrular. Flutter package dependency
-resolution, plugin native compilation, QR gösterme ve kamera tarama sonucu
-**henüz doğrulanmadı**.
+İlk ortam kaydından sonra Flutter package dependency resolution, Example Windows shell build ve başlangıç çalıştırması doğrulandı; QR gösterme ve Android/iOS kamera tarama **henüz uygulanmadı/doğrulanmadı**.
 
 ## Aşama 1 uygulama kanıtı ve açık işler (2026-10-14)
 
@@ -91,37 +92,34 @@ resolution, plugin native compilation, QR gösterme ve kamera tarama sonucu
   CLI üzerinden native runner üretimi yapılmadı.
 - `example/lib/main.dart` derlenebilir olması hedeflenen, henüz yalnız
   yer tutucu açıklama gösteren basit MaterialApp içerir.
-- `example/test/widget_test.dart` tek smoke testi kaydedildi fakat
-  **çalıştırılmadı**; otomatik üretilen eski counter testinden kaçınıldı.
+- `example/test/widget_test.dart` smoke testi kullanıcı tarafından `flutter test` ile **PASS** (+1) sonucu verdi.
 - Dev lints için `flutter_lints: ^5.0.0` seçildi. v6.0.0, Dart 3.8+
   gerektirdiğinden minimum SDK 3.7 kontratıyla uyumsuzdu.
 
-### Kullanıcının yerel ortamında tamamlanacak
+### Kullanıcı PowerShell kanıtı — Aşama 1 (2026-10-14)
 
-```powershell
-cd D:\development\cross-platform\remvibe_ui_qrcode
-git pull --ff-only origin feature/initial-qr-widgets
-flutter pub get
-flutter create --platforms=android,ios,windows,linux,macos --project-name=remvibe_ui_qrcode_example example
-cd example
-flutter pub get
-flutter analyze
-flutter test
-flutter run -d windows
-```
+- `git pull --ff-only origin feature/initial-qr-widgets`: PASS, `55b9db9` yerel HEAD.
+- Root `flutter pub get`: PASS, `pretty_qr_code 3.6.0` ve `mobile_scanner 7.4.2` çözümlendi.
+- `flutter create --platforms=android,ios,windows,linux,macos --project-name=remvibe_ui_qrcode_example example`: PASS; 120 dosya üretildi.
+- Example `flutter pub get`: PASS.
+- Example `flutter analyze`: PASS (No issues found).
+- Example `flutter test`: PASS (+1 All tests passed).
+- Example `flutter run -d windows`: BUILD_VERIFIED; exe oluşturuldu, Dart VM Service açıldı ve dosyalar cihaza eşitlendi; ardından `Lost connection to device` mesajı geldi. Bunun kullanıcı tarafından pencere kapatılması mı veya runtime problemi mi olduğu bilinmiyor: UNRESOLVED. Kararlı pencere/etkileşim LIVE_VERIFIED sayılmaz.
+- Root `flutter analyze`: PASS (No issues found).
+- `git status`: mevcut tracked dosyalarda değişiklik bildirilmedi; Example native runner klasörleri, `example/.gitignore`, `example/.metadata`, `example/README.md`, `example/pubspec.lock` untracked.
+- Android cihaz, iOS/Linux/macOS native build, QR gösterme/tarama: NOT_RUN.
+- 10 newer dependency uyarısı bağımlılık çözümleme başarısızlığı değildir.
 
-Komutlarda `--overwrite` kullanılmaz; mevcut Example Dart kaynakları
-korunmalı. Çalıştırma sonucu, oluşturulan native dosyalar ve gerçek diff
-gözden geçirildikten sonra commit edilecek. Flutter create varsayılan
-generated örnek veya dosya eklerse gereksizleri commit'e almadan önce
-incelenecek. `flutter run` başarısı yalnız **Example shell** kanıtıdır,
-QR widget doğrulaması değildir.
+### Checkpoint kapanışı için kalan iş
+
+1. GitHub continuity değişikliğini yerel branch'e çek.
+2. Yerel üretilen native dosyaları, Example metadata ve uygulama lockfile'ını stage et. `git diff --cached --check`, `git diff --cached --stat`, `git status` ile kontrol et; build, .idea ve .dart_tool dosyalarını commit etme.
+3. Native dosyaları feature branch'e commit/push et.
+4. Gerekirse Windows Example penceresi bağlantısının neden kesildiğini ayrı doğrula. Şimdilik kararlı LIVE_VERIFIED demiyoruz.
 
 ## Sonraki hedef
 
-1. Yukarıdaki Flutter CLI komutlarının yerel çıktısını ve `git status`/
-   `git diff` durumunu incele, native runner dosyalarını aynı branch'te kaydet.
-2. Root `flutter analyze` ve Example için `flutter analyze`, `flutter test`,
-   `flutter run -d windows` sonuçlarını belgeleyip Aşama 1'i kapat.
+1. Üretilen native runner dosyaları, Example lockfile ve metadata Git diff üzerinden kontrol edilip feature branch'e push edilsin.
+2. Windows Example bağlantısının kesilme nedeni gerekiyorsa kısa tekrar denemeyle netleştirilsin; Aşama 1 kapatılsın.
 3. Sonraki ayrı onayla Aşama 2 `RemVibeUIQRCode` implementasyonuna başla;
    ilk gerçek Windows QR görüntüleme sonucu continuity'de saklanacak.
