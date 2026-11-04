@@ -9,6 +9,7 @@ Yeni sohbet, Codex oturumu veya development checkpoint öncesinde sırasıyla:
 
 okunmalıdır.
 
+- [UC1_IOS_SIMULATOR_SMOKE.md](UC1_IOS_SIMULATOR_SMOKE.md): Update Center için ayrı iOS Simulator CI derleme denemesi (ürün widget koduna dokunmadan).
 - `CURRENT_TARGET.md`: aktif checkpoint, tamamlanan iş, doğrulama ve sıradaki hedef.
 - `ARCHITECTURE.md`: platform matrisi, public API, hata/lifecycle contracts.
 - Yalnız gerçekten gerekli olursa yeni belge eklenir; tek widget için
